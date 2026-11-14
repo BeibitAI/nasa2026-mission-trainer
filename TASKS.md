@@ -2,7 +2,7 @@
 
 **Дедлайн подачи:** воскресенье 15.11, **23:59 (Asia/Almaty)**. Наша цель — подать к **23:00**.
 **Приоритет:** играбельное демо в браузере > красота > доп. фичи.
-**Ссылки:** репо `github.com/BeibitAI/nasa2026-mission-trainer` · игра `https://beibitai.github.io/nasa2026-mission-trainer/` (после M0) · бэкенд `https://<render-url>` (заполнит Адлет)
+**Ссылки:** репо `github.com/BeibitAI/nasa2026-mission-trainer` · игра `https://beibitai.github.io/nasa2026-mission-trainer/` (после M0) · бэкенд `https://mission-trainer-api.onrender.com` (Render, free)
 **Документы:** [docs/CONCEPT.md](docs/CONCEPT.md) · [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · [CONTRIBUTING.md](CONTRIBUTING.md) · [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) (проверка по ТЗ) · задачи в Word — в общем чате
 **Обновлено Сб 14.11, 21:15:** P0 по ТЗ сделан (Weather Station, возраст 7–12, «sol» объяснён, источники только реальные). Открытые: сборка Unity (Арыстан), баланс P1 (Адлет → Арыстан).
 
