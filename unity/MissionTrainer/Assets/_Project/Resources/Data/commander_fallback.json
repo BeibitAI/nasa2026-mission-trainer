@@ -1,0 +1,32 @@
+{
+  "briefing": [
+    "Good morning, Commander! You have power to share today. Where should it go?",
+    "A new sol on Mars! Check the bars, then decide how to use our power.",
+    "Rise and shine, Commander! The crew is waiting for your plan."
+  ],
+  "ok": [
+    "Nice work! The base is running smoothly and the crew is happy.",
+    "Great choices! Everything is steady here at Gale Crater.",
+    "Smooth sol, Commander. Mission planners would give you a thumbs up!"
+  ],
+  "warning": [
+    "Careful, Commander! One of our bars is getting low. Every power choice has a cost.",
+    "Hmm, something needs attention. Look for the lowest bar.",
+    "We are okay for now, but we can't keep doing this for long."
+  ],
+  "fail": [
+    "The mission had to end early. Real planners learn from every try, and so can you!",
+    "We ran out of something important. Every resource matters on Mars."
+  ],
+  "win": [
+    "Mission complete! You kept the crew safe AND finished the science. Amazing!",
+    "You did it, Commander! That's exactly how real mission planners think."
+  ],
+  "tips": [
+    "Life support keeps the crew breathing. Never let it run out!",
+    "The greenhouse grows food, but it needs power every sol.",
+    "Shields block radiation, invisible energy from space that can hurt the crew.",
+    "Science is why we came, but the crew must stay safe first.",
+    "A dust storm means less sunlight, so less solar power."
+  ]
+}

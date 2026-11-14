@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mission Trainer — Junior Astronaut</title>
+  <meta name="description" content="A free browser game for kids 7–12: run a base on Mars and balance air, food and radiation shielding using real NASA data.">
+  <!-- OWNER: Muhammad. TODO(Muhammad): final design, OG image, favicon, team photos. -->
+  <style>
+    :root {
+      --bg: #0d0b14; --panel: #17131f; --text: #f3ede6; --muted: #b6aca3;
+      --mars: #e0703a; --mars-2: #ff9a5c; --ok: #6fd3a5; --line: #2a2433;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: var(--bg); color: var(--text);
+      font: 17px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+    a { color: var(--mars-2); }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+    header { padding: 56px 0 28px; background: radial-gradient(ellipse at 70% 0%, #3a1a10 0%, transparent 60%); }
+    .tag { display: inline-block; font-size: 13px; letter-spacing: .08em; text-transform: uppercase;
+      color: var(--mars-2); border: 1px solid #5a2b18; padding: 3px 10px; border-radius: 999px; }
+    h1 { font-size: clamp(32px, 6vw, 56px); line-height: 1.1; margin: 14px 0 10px; }
+    .lead { font-size: clamp(17px, 2.4vw, 21px); color: var(--muted); max-width: 720px; margin: 0; }
+    .cta { display: inline-block; margin-top: 22px; background: var(--mars); color: #1a0d06; font-weight: 700;
+      padding: 12px 22px; border-radius: 10px; text-decoration: none; }
+    section { padding: 36px 0; border-top: 1px solid var(--line); }
+    h2 { font-size: 26px; margin: 0 0 14px; }
+    .game { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #000; border: 1px solid var(--line);
+      border-radius: 12px; overflow: hidden; }
+    .game iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+    .mobile-note { display: none; color: var(--muted); font-size: 15px; margin-top: 8px; }
+    @media (max-width: 760px) { .mobile-note { display: block; } }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+    .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+    .card h3 { margin: 0 0 6px; font-size: 18px; }
+    .card p { margin: 0; color: var(--muted); font-size: 15px; }
+    .src { display: block; text-decoration: none; color: inherit; }
+    .src:hover { border-color: var(--mars); }
+    .src small { color: var(--mars-2); }
+    footer { padding: 28px 0 48px; color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <span class="tag">NASA Space Apps Challenge 2026</span>
+      <h1>Can you keep the crew safe on Mars?</h1>
+      <p class="lead">A free browser game for kids 7–12. Share your base's power between air, food,
+        radiation shields and science — every choice has a cost, just like for real mission planners.
+        The radiation storms in the game were measured by NASA's Curiosity rover.</p>
+      <a class="cta" href="#play">Play now — no download</a>
+    </div>
+  </header>
+
+  <main>
+    <section id="play">
+      <div class="wrap">
+        <h2>Play</h2>
+        <div class="game">
+          <iframe src="play/index.html" title="Mission Trainer game" allow="fullscreen; autoplay" loading="lazy"></iframe>
+        </div>
+        <p class="mobile-note">Best on a computer (Chrome or Edge).</p>
+      </div>
+    </section>
+
+    <section id="how">
+      <div class="wrap">
+        <h2>How to play</h2>
+        <div class="grid">
+          <div class="card"><h3>1. Morning briefing</h3><p>Commander Nova tells you about the weather on Mars and the Sun.</p></div>
+          <div class="card"><h3>2. Share the power</h3><p>Split your power units between life support, the greenhouse, shields and science.</p></div>
+          <div class="card"><h3>3. Watch the sol</h3><p>Dust storms and solar storms can change everything.</p></div>
+          <div class="card"><h3>4. Learn why</h3><p>See what your choices did — and survive 14 sols with your science goal.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="science">
+      <div class="wrap">
+        <h2>Real NASA data inside</h2>
+        <p class="lead">Nothing here is made up. These are the sources the game uses:</p>
+        <div class="grid" id="sources" style="margin-top:16px"></div>
+      </div>
+    </section>
+
+    <section id="ai">
+      <div class="wrap">
+        <h2>How we used AI (Super Intelligence)</h2>
+        <!-- TODO(Adlet/Daria): final text for the "Use of SI" disclosure. -->
+        <p class="lead">Commander Nova's short explanations are written live by Google Gemini from the game's own
+          numbers — it is told to use only those numbers and facts. If Gemini is unavailable, the game uses
+          pre-written texts. AI tools also helped us write code and documentation. No personal data is sent.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      Built in 48 hours by Team BeibitAI for the
+      <a href="https://www.spaceappschallenge.org/2026/challenges/junior-astronaut-mission-trainer/">Build a Junior Astronaut Mission Trainer</a> challenge.
+      Source code: <a href="https://github.com/BeibitAI/nasa2026-mission-trainer">GitHub</a>.
+      This is a student project and is not endorsed by NASA.
+    </div>
+  </footer>
+
+  <script>
+    // Same file as the in-game Data Sources screen (copied from Unity Resources/Data/sources.json).
+    fetch("data/sources.json")
+      .then(r => r.json())
+      .then(({ sources }) => {
+        const box = document.getElementById("sources");
+        for (const s of sources) {
+          const el = document.createElement(s.url ? "a" : "div");
+          el.className = "card src";
+          if (s.url) { el.href = s.url; el.target = "_blank"; el.rel = "noopener"; }
+          const h = document.createElement("h3"); h.textContent = s.title;
+          const small = document.createElement("small"); small.textContent = s.provider;
+          const p = document.createElement("p"); p.textContent = s.usedFor;
+          el.append(h, small, p);
+          box.append(el);
+        }
+      })
+      .catch(() => {});
+  </script>
+</body>
+</html>

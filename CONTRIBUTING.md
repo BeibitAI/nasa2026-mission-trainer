@@ -7,7 +7,7 @@ git lfs install
 git clone https://github.com/BeibitAI/nasa2026-mission-trainer.git
 ```
 
-- **Unity:** версия `____________` (Арыстан впишет точную из `unity/MissionTrainer/ProjectSettings/ProjectVersion.txt`). Открывать **только эту** версию — иначе Unity переапгрейдит проект и сломает всем.
+- **Unity:** версия **`6000.3.8f1`** (Арыстан, подтверди по `unity/MissionTrainer/ProjectSettings/ProjectVersion.txt`). Создание проекта — по [unity/README.md](unity/README.md). Открывать **только эту** версию — иначе Unity переапгрейдит проект и сломает всем.
 - **Python 3.11+** (для бэкенда и скриптов данных).
 - Никогда не коммитим `.env` и ключи. Ключи есть только у Адлета и в Render.
 
