@@ -88,14 +88,15 @@ namespace MissionTrainer
                     c.briefingNotes.Add($"Space weather warning: {e.def.title} expected tomorrow!");
                 if (day < 0 || day >= e.def.durationSols) continue;
 
+                bool known = !e.def.needsWarning || earlyWarning || day > 0;
                 var active = new ActiveEvent
                 {
                     def = e.def,
                     startSol = e.startSol,
                     dayIndex = day,
                     solarFactor = e.def.solarFactor,
-                    radiationMultiplier = e.def.useRealRadiationProfile ? RealMultiplier(day) : e.def.radiationMultiplier,
-                    known = !e.def.needsWarning || earlyWarning || day > 0,
+                    radiationMultiplier = e.def.useRealRadiationProfile ? RealMultiplier(day, known) : e.def.radiationMultiplier,
+                    known = known,
                 };
                 c.active.Add(active);
                 c.solarFactor *= active.solarFactor;
@@ -108,11 +109,13 @@ namespace MissionTrainer
             return c;
         }
 
-        /// <summary>Daily mean during the real event divided by the quiet baseline (Curiosity RAD, Sep 2017).</summary>
-        float RealMultiplier(int dayIndex)
+        /// <summary>Daily mean during the real event divided by the quiet baseline (Curiosity RAD, Sep 2017).
+        /// A surprise storm (no warning, crew caught outside) uses the real peak hour instead.</summary>
+        float RealMultiplier(int dayIndex, bool known)
         {
             if (radiation == null || radiation.events == null || radiation.events.Count == 0) return 2f;
             var ev = radiation.events[0];
+            if (!known && dayIndex == 0 && ev.peakMultiplier > 0f) return Mathf.Clamp(ev.peakMultiplier, 1f, 5f);
             int start = radiation.dailyDates.IndexOf(ev.realDate);
             int i = start + dayIndex;
             if (start < 0 || i >= radiation.dailyMean.Count || ev.baselineValue <= 0f) return ev.peakMultiplier;

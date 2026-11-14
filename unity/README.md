@@ -33,14 +33,18 @@ Unity Hub refuses to create a project in a non-empty folder, so:
 | `Scripts/Fakes/` | Omar | Offline services (also the fallback when backend fails) |
 | `Resources/Data/` | Omar (format), Adlet (data), Daria (texts) | `config.json` → set `apiBaseUrl` once Render is live |
 
-## Balance sanity check (Python port of ResourceModel, 2000 runs each)
+## Balance (Python port of ResourceModel + EventDirector, 3000 random missions)
 
-| Strategy (LS/Greenhouse/Shield/Science) | Result |
+Rules: background dose = cosmic rays (shield can't stop it); the shield blocks part of the EXTRA solar-storm dose;
+science = work outside, extra dose x storm strength; a storm with no warning hits at the real peak hour (2.77x).
+
+| Strategy (LS/Greenhouse/Shield/Science) | Wins |
 |---|---|
-| no shield, max science | 100% fail — radiation |
-| balanced 3/2/2/3 | 100% win |
-| heavy shield 3/2/4/1 | 100% fail — not enough science |
-| skip greenhouse | 100% fail — food |
-| science first | 70% win / 30% fail — air (dust storms) |
+| same split every sol (best one: 3/2/1/rest + station) | 47% |
+| same split, no station (best: shield 2) | 47% |
+| react to warnings (shield 5 + no outside work on storm sols), Weather Station ON | **92%** |
+| react to warnings, no station (storm day 1 is a surprise) | 27% |
+| heavy shield 3/2/4/1 | 0% — not enough science |
+| no shield, max science, ignore warnings | 17% |
 
-Every extreme fails for a *different* reason — that's the trade-off the challenge asks for. Tune in `scenario_mars.json`.
+Winning needs reacting to events and paying for early warning. Tune in `scenario_mars.json`.

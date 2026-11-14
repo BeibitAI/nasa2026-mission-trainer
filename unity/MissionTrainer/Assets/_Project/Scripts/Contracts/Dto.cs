@@ -165,7 +165,8 @@ namespace MissionTrainer
         public int sols;
         public int powerPerSol;
         public int crew;
-        public float baseDosePerSol;        // game units per sol at normal background
+        public float baseDosePerSol;        // game units per sol at normal background (cosmic rays; the shield can't stop it)
+        public float outsideDosePerScienceUnit; // science = work outside; extra dose per unit, multiplied by storm strength
         public float doseLimit;
         public int commsDelaySols;          // Mars: storm warnings from Earth arrive late
         public int weatherStationPowerCost = 1; // local storm warning costs power every sol it is on

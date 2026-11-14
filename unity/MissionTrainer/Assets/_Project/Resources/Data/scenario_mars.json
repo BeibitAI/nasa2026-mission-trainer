@@ -4,7 +4,8 @@
   "sols": 14,
   "powerPerSol": 10,
   "crew": 4,
-  "baseDosePerSol": 7,
+  "baseDosePerSol": 3.64,
+  "outsideDosePerScienceUnit": 0.91,
   "doseLimit": 100,
   "commsDelaySols": 1,
   "weatherStationPowerCost": 1,
@@ -12,7 +13,8 @@
   "introNotes": [
     "Welcome to Gale Crater on Mars! A 'sol' is one day on Mars: 24 hours and 40 minutes.",
     "Radiation is invisible energy from space. The dose bar shows how much the crew has absorbed. If it fills up, the crew must go home.",
-    "Life support makes air and clean water. The greenhouse grows food. Shields block radiation."
+    "Life support makes air and clean water. The greenhouse grows food. The shield is a storm shelter: it blocks extra radiation from solar storms.",
+    "Science means working outside. During a solar storm, working outside is risky - stay in the shelter!"
   ],
   "radiationFile": "radiation_mars",
   "start": {
@@ -38,7 +40,7 @@
     },
     "science": {
       "pointsPerUnit": 1,
-      "goal": 24
+      "goal": 32
     }
   }
 }

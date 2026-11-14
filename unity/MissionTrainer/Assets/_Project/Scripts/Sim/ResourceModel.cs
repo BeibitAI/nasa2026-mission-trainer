@@ -1,6 +1,8 @@
 // Pure C# simulation rules — no MonoBehaviour, easy to test and balance.
 // OWNER: Arystan
-// TODO(Arystan): balance after playing 5 runs with different strategies — no "free" choice allowed.
+// Balance (scenario_mars.json) checked with a Python port, 3000 random missions: same split every sol wins <= 47%,
+// reacting to storm warnings with the Weather Station on wins ~92%, without the station ~27%.
+// TODO(Arystan): play 5 runs with different strategies and confirm it feels fair.
 // TODO(Arystan): module effects (Battery stores unused power, Shelter = permanent shield bonus...).
 using UnityEngine;
 
@@ -21,8 +23,14 @@ namespace MissionTrainer
             after.air = Mathf.Clamp(after.air + SystemDelta(s.lifeSupport, a.lifeSupport), 0f, 100f);
             after.food = Mathf.Clamp(after.food + SystemDelta(s.greenhouse, a.greenhouse), 0f, 100f);
 
+            // Background dose on Mars is mostly high-energy cosmic rays: always there, the shield can't stop it.
+            // Solar storm particles have less energy, so shelter blocks part of the EXTRA storm dose.
+            // Science is work outside the shelter: the stronger the storm, the riskier it is.
+            // => shielding every sol is wasted power; shielding (and staying inside) on storm sols pays off.
             float reduction = Mathf.Min(s.shield.maxReduction, a.shield * s.shield.reductionPerUnit);
-            float doseAdded = cfg.baseDosePerSol * c.radiationMultiplier * (1f - reduction);
+            float storm = Mathf.Max(0f, c.radiationMultiplier - 1f);
+            float doseAdded = cfg.baseDosePerSol * (1f + storm * (1f - reduction))
+                              + cfg.outsideDosePerScienceUnit * a.science * c.radiationMultiplier;
             after.dose = Mathf.Min(cfg.doseLimit, after.dose + doseAdded);
 
             after.science += a.science * s.science.pointsPerUnit;

@@ -17,8 +17,8 @@ namespace MissionTrainer
         {
             ("lifeSupport", "Life Support (air & water)"),
             ("greenhouse", "Greenhouse (food)"),
-            ("shield", "Radiation Shield"),
-            ("science", "Science"),
+            ("shield", "Storm Shield (solar storms)"),
+            ("science", "Science (work outside)"),
         };
 
         void Awake() => t = GetComponent<TurnController>();
@@ -114,7 +114,9 @@ namespace MissionTrainer
             if (r == null) return;
             var sb = new StringBuilder();
             sb.AppendLine($"Air {r.before.air:0} -> {r.after.air:0}   Food {r.before.food:0} -> {r.after.food:0}");
-            sb.AppendLine($"Radiation +{r.doseAdded:0.0} (shield blocked {r.shieldReduction * 100f:0}%)");
+            sb.AppendLine(r.conditions.radiationMultiplier > 1f
+                ? $"Radiation +{r.doseAdded:0.0} (shield blocked {r.shieldReduction * 100f:0}% of the extra storm radiation)"
+                : $"Radiation +{r.doseAdded:0.0} (normal day: cosmic rays, the shield cannot stop them)");
             foreach (var e in r.conditions.active)
             {
                 sb.AppendLine($"Event: {e.def.title}: {e.def.fact}");
