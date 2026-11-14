@@ -43,6 +43,7 @@ namespace MissionTrainer
             scroll = GUILayout.BeginScrollView(scroll);
 
             GUILayout.Label($"{t.Scenario.displayName} | Sol {t.Sol}/{t.Scenario.sols}", title);
+            GUILayout.Label("(a sol is one day on Mars: 24 hours 40 minutes)", box);
             Bar("Air & Water", t.State.air, 100);
             Bar("Food", t.State.food, 100);
             Bar("Radiation dose", t.State.dose, t.Scenario.doseLimit);
@@ -96,6 +97,14 @@ namespace MissionTrainer
                 if (GUILayout.Button("+", big, GUILayout.Width(60), GUILayout.Height(40))) t.TryChange(id, +1);
                 GUILayout.EndHorizontal();
             }
+            if (t.Scenario.commsDelaySols > 0)
+            {
+                string station = t.WeatherStationOn
+                    ? $"Weather Station: ON (uses {t.Scenario.weatherStationPowerCost} power) - tap to turn off"
+                    : $"Weather Station: OFF - tap to turn on (costs {t.Scenario.weatherStationPowerCost} power every sol)";
+                if (GUILayout.Button(station, big, GUILayout.Height(44))) t.ToggleWeatherStation();
+                GUILayout.Label("Radio from Earth takes minutes to reach Mars. The station warns you about storms in time, starting tomorrow.", box);
+            }
             if (GUILayout.Button("Start the sol >", big, GUILayout.Height(50))) t.CommitAllocation();
         }
 
@@ -106,7 +115,11 @@ namespace MissionTrainer
             var sb = new StringBuilder();
             sb.AppendLine($"Air {r.before.air:0} -> {r.after.air:0}   Food {r.before.food:0} -> {r.after.food:0}");
             sb.AppendLine($"Radiation +{r.doseAdded:0.0} (shield blocked {r.shieldReduction * 100f:0}%)");
-            foreach (var e in r.conditions.active) sb.AppendLine($"Event: {e.def.title}: {e.def.fact}");
+            foreach (var e in r.conditions.active)
+            {
+                sb.AppendLine($"Event: {e.def.title}: {e.def.fact}");
+                if (!e.known && !string.IsNullOrEmpty(t.Scenario.commsDelayFact)) sb.AppendLine("Surprise! " + t.Scenario.commsDelayFact);
+            }
             GUILayout.Label(sb.ToString(), box);
         }
 

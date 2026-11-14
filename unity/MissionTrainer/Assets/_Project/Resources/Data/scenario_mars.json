@@ -7,12 +7,38 @@
   "baseDosePerSol": 7,
   "doseLimit": 100,
   "commsDelaySols": 1,
+  "weatherStationPowerCost": 1,
+  "commsDelayFact": "Radio signals from Earth take about 4 to 24 minutes to reach Mars, so Earth's storm warning arrived too late. A Weather Station on the base can warn you in time.",
+  "introNotes": [
+    "Welcome to Gale Crater on Mars! A 'sol' is one day on Mars: 24 hours and 40 minutes.",
+    "Radiation is invisible energy from space. The dose bar shows how much the crew has absorbed. If it fills up, the crew must go home.",
+    "Life support makes air and clean water. The greenhouse grows food. Shields block radiation."
+  ],
   "radiationFile": "radiation_mars",
-  "start": { "air": 80, "food": 80, "dose": 0, "science": 0 },
+  "start": {
+    "air": 80,
+    "food": 80,
+    "dose": 0,
+    "science": 0
+  },
   "systems": {
-    "lifeSupport": { "upkeep": 3, "gainPerExtraUnit": 4, "lossPerMissingUnit": 12 },
-    "greenhouse":  { "upkeep": 2, "gainPerExtraUnit": 4, "lossPerMissingUnit": 8 },
-    "shield":      { "reductionPerUnit": 0.15, "maxReduction": 0.75 },
-    "science":     { "pointsPerUnit": 1, "goal": 24 }
+    "lifeSupport": {
+      "upkeep": 3,
+      "gainPerExtraUnit": 4,
+      "lossPerMissingUnit": 12
+    },
+    "greenhouse": {
+      "upkeep": 2,
+      "gainPerExtraUnit": 4,
+      "lossPerMissingUnit": 8
+    },
+    "shield": {
+      "reductionPerUnit": 0.15,
+      "maxReduction": 0.75
+    },
+    "science": {
+      "pointsPerUnit": 1,
+      "goal": 24
+    }
   }
 }

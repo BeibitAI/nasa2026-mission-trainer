@@ -1,20 +1,39 @@
 {
   "sources": [
-    { "id": "radlab_msl", "title": "Curiosity rover radiation (RAD)", "provider": "NASA OSDR RadLab",
-      "url": "https://visualization.osdr.nasa.gov/radlab/", "usedFor": "Normal radiation at Gale Crater and the real solar storm of 11-12 Sep 2017." },
-    { "id": "radlab_crater", "title": "LRO CRaTER radiation (lunar orbit)", "provider": "NASA OSDR RadLab",
-      "url": "https://visualization.osdr.nasa.gov/radlab/", "usedFor": "Radiation near the Moon (measured in orbit)." },
-    { "id": "donki", "title": "Space Weather Database (DONKI)", "provider": "NASA CCMC / api.nasa.gov",
-      "url": "https://ccmc.gsfc.nasa.gov/tools/DONKI/", "usedFor": "Today's real Sun: solar eruptions and storm risk." },
-    { "id": "marstrek", "title": "Mars Trek", "provider": "NASA",
-      "url": "https://trek.nasa.gov/mars/", "usedFor": "Real terrain of Gale Crater." },
-    { "id": "osdr", "title": "Open Science Data Repository", "provider": "NASA",
-      "url": "https://osdr.nasa.gov/bio/repo/", "usedFor": "Real science about astronaut health." },
-    { "id": "nasa_std_3001", "title": "Astronaut radiation limit (NASA-STD-3001)", "provider": "NASA",
-      "url": "https://www.nasa.gov/wp-content/uploads/2023/03/radiation-protection-technical-brief-ochmo.pdf", "usedFor": "Why the crew has a radiation limit." },
-    { "id": "csa_food", "title": "Food production on the Moon", "provider": "Canadian Space Agency",
-      "url": "https://www.asc-csa.gc.ca/eng/youth-educators/toolkits/food-production/", "usedFor": "How the greenhouse grows food." },
-    { "id": "opportunity_2018", "title": "Opportunity and the 2018 dust storm", "provider": "NASA",
-      "url": "", "usedFor": "Why dust storms cut solar power. TODO(Adlet): add NASA link." }
+    {
+      "id": "radlab_msl",
+      "title": "Curiosity rover radiation (RAD)",
+      "provider": "NASA OSDR RadLab",
+      "url": "https://visualization.osdr.nasa.gov/radlab/",
+      "usedFor": "The real solar storm of 11-12 Sep 2017 measured at Gale Crater: how much stronger radiation got each day."
+    },
+    {
+      "id": "donki",
+      "title": "Space Weather Database (DONKI)",
+      "provider": "NASA CCMC / api.nasa.gov",
+      "url": "https://ccmc.gsfc.nasa.gov/tools/DONKI/",
+      "usedFor": "The real Sun: recent solar eruptions change how likely a storm is in your mission."
+    },
+    {
+      "id": "comms_delay",
+      "title": "Space Communications: 7 Things You Need to Know",
+      "provider": "NASA",
+      "url": "https://www.nasa.gov/missions/tech-demonstration/space-communications-7-things-you-need-to-know/",
+      "usedFor": "Radio signals take about 4 to 24 minutes between Earth and Mars - why storm warnings can be late."
+    },
+    {
+      "id": "opportunity_2018",
+      "title": "Opportunity rover mission comes to end",
+      "provider": "NASA",
+      "url": "https://www.nasa.gov/news-release/nasas-record-setting-opportunity-rover-mission-on-mars-comes-to-end/",
+      "usedFor": "Why dust storms cut solar power."
+    },
+    {
+      "id": "nasa_std_3001",
+      "title": "Astronaut radiation limit (NASA-STD-3001)",
+      "provider": "NASA",
+      "url": "https://www.nasa.gov/wp-content/uploads/2023/03/radiation-protection-technical-brief-ochmo.pdf",
+      "usedFor": "Why the crew has a radiation limit."
+    }
   ]
 }

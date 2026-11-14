@@ -156,7 +156,7 @@ Unity: no answer in 6 s → local template. Same UI either way.
 ```
 
 - No key in the client or the repo; only `backend/.env` (gitignored) and Render env vars.
-- System prompt: *friendly mission commander for kids 8–12; ≤ 40 words; simple English; use ONLY the numbers and facts provided; never scary; end with a tip.* JSON output (`text`, `tip`). Gemini rephrases the simulation — it cannot invent science numbers.
+- System prompt: *friendly mission commander for kids 7–12; ≤ 40 words; simple English; use ONLY the numbers and facts provided; never scary; end with a tip.* JSON output (`text`, `tip`). Gemini rephrases the simulation — it cannot invent science numbers.
 - SDK: `google-genai`. Model name from env so it can change without code changes.
 - Gemini free tier may use prompts to improve Google products → we send only game state (no nickname, no personal data). Mention in the SI section.
 

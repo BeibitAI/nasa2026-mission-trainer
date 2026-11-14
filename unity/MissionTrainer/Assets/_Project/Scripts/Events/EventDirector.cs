@@ -5,8 +5,9 @@
 //   Guaranteed once per mission so every playthrough shows real data.
 // - Dust storm: halves solar power.
 // - Real Sun: NASA DONKI risk level (backend or bundled snapshot) boosts storm chance.
-// - Communication delay: on Mars, Earth's storm warning arrives too late (no warning on day 1),
-//   unless a Weather Station is built. With no delay (Moon) the warning comes the sol before.
+// - Communication delay (player decision): on Mars, Earth's storm warning arrives too late (no warning
+//   on day 1) unless the Weather Station is ON — it costs power every sol (TurnController.ToggleWeatherStation).
+//   With no delay (Moon) the warning comes the sol before.
 //
 // TODO(Omar): tune chances with Arystan; add more event types if time (equipment failure, meteorite...).
 using System.Collections.Generic;
@@ -70,7 +71,15 @@ namespace MissionTrainer
             bool hasStation = builtModules != null && builtModules.Contains(WeatherStation);
             bool earlyWarning = hasStation || cfg.commsDelaySols <= 0;
 
-            if (sol == 1) c.briefingNotes.Add(RealSunNote());
+            if (sol == 1)
+            {
+                if (cfg.introNotes != null) c.briefingNotes.AddRange(cfg.introNotes);
+                c.briefingNotes.Add(RealSunNote());
+            }
+            if (cfg.commsDelaySols > 0)
+                c.briefingNotes.Add(hasStation
+                    ? "Weather Station is watching the Sun: you will get storm warnings in time."
+                    : "No Weather Station: Earth's storm warnings may arrive too late.");
 
             foreach (var e in scheduled)
             {
@@ -114,9 +123,12 @@ namespace MissionTrainer
         string RealSunNote()
         {
             if (spaceWeather == null) return "No space weather data today.";
-            string when = spaceWeather.live ? "today" : $"data as of {Date(spaceWeather.fetchedAt)}";
+            string when = spaceWeather.live ? "live today" : $"data as of {Date(spaceWeather.fetchedAt)}";
+            string effect = spaceWeather.riskLevel == "high" ? "Solar storms are MUCH more likely this mission - think about shields!"
+                : spaceWeather.riskLevel == "medium" ? "Solar storms are a bit more likely this mission."
+                : "The real Sun is quiet, but storms can still happen.";
             return $"Real Sun (NASA DONKI, {when}): {spaceWeather.cmeCount} solar eruptions in the last " +
-                   $"{spaceWeather.days} days. Storm risk: {spaceWeather.riskLevel}.";
+                   $"{spaceWeather.days} days. Risk: {spaceWeather.riskLevel}. {effect}";
         }
 
         static string Date(string iso) => string.IsNullOrEmpty(iso) || iso.Length < 10 ? "unknown" : iso.Substring(0, 10);

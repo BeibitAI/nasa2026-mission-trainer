@@ -5,18 +5,30 @@
       "title": "Solar particle storm",
       "fact": "On 11 Sep 2017, NASA's Curiosity rover measured more than twice the normal radiation here at Gale Crater, after a huge eruption on the Sun.",
       "sourceId": "radlab_msl",
-      "minSol": 5, "maxSol": 11, "chancePerSol": 0.12, "oncePerMission": true,
-      "durationSols": 2, "solarFactor": 1, "radiationMultiplier": 1,
-      "useRealRadiationProfile": true, "needsWarning": true
+      "minSol": 5,
+      "maxSol": 11,
+      "chancePerSol": 0.12,
+      "oncePerMission": true,
+      "durationSols": 2,
+      "solarFactor": 1,
+      "radiationMultiplier": 1,
+      "useRealRadiationProfile": true,
+      "needsWarning": true
     },
     {
       "id": "dust_storm",
       "title": "Dust storm",
-      "fact": "In 2018 a dust storm covered the whole planet. Sunlight dropped so much that NASA's solar-powered Opportunity rover ran out of power.",
+      "fact": "In 2018 a dust storm covered the whole planet. Sunlight dropped so much that NASA's solar-powered Opportunity rover could not recharge, and it went silent.",
       "sourceId": "opportunity_2018",
-      "minSol": 3, "maxSol": 13, "chancePerSol": 0.12, "oncePerMission": false,
-      "durationSols": 2, "solarFactor": 0.5, "radiationMultiplier": 1,
-      "useRealRadiationProfile": false, "needsWarning": false
+      "minSol": 3,
+      "maxSol": 13,
+      "chancePerSol": 0.12,
+      "oncePerMission": false,
+      "durationSols": 2,
+      "solarFactor": 0.5,
+      "radiationMultiplier": 1,
+      "useRealRadiationProfile": false,
+      "needsWarning": false
     }
   ]
 }

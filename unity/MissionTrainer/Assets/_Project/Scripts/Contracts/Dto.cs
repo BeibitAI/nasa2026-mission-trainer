@@ -50,6 +50,7 @@ namespace MissionTrainer
         public SolConditions conditions;
         public float shieldReduction;  // 0..1
         public float doseAdded;
+        public bool weatherStationOn;  // comms-delay decision for this sol
         public string outcome;         // ok | warning | fail | win
         public string failReason;      // air | food | dose | science | null
     }
@@ -167,6 +168,9 @@ namespace MissionTrainer
         public float baseDosePerSol;        // game units per sol at normal background
         public float doseLimit;
         public int commsDelaySols;          // Mars: storm warnings from Earth arrive late
+        public int weatherStationPowerCost = 1; // local storm warning costs power every sol it is on
+        public string commsDelayFact;       // shown when a storm arrives unannounced
+        public List<string> introNotes = new List<string>(); // sol 1: explain terms (sol, radiation dose...)
         public string radiationFile;        // e.g. radiation_mars
         public ResourceState start;
         public SystemsConfig systems;

@@ -25,7 +25,12 @@ namespace MissionTrainer
         public CommanderReply CommanderMessage { get; private set; }
         public SpaceWeatherSummary SpaceWeather { get; private set; }
         public int Sol { get; private set; }
-        public int AvailablePower => Conditions == null ? 0 : ResourceModel.AvailablePower(Scenario, Conditions);
+        /// <summary>Comms-delay decision: the local Weather Station warns about solar storms in time,
+        /// but uses power every sol it is on. Takes effect from the NEXT sol (it needs time to watch the Sun).</summary>
+        public bool WeatherStationOn { get; private set; }
+        public int StationCost => WeatherStationOn ? Scenario.weatherStationPowerCost : 0;
+        public int AvailablePower => Conditions == null ? 0
+            : Mathf.Max(0, ResourceModel.AvailablePower(Scenario, Conditions) - StationCost);
         public int UnusedPower => AvailablePower - Allocation.Total;
         public readonly List<SolResult> History = new List<SolResult>();
         public readonly HashSet<string> BuiltModules = new HashSet<string>();
@@ -43,6 +48,7 @@ namespace MissionTrainer
             Sol = 0;
             History.Clear();
             BuiltModules.Clear();
+            WeatherStationOn = false;
             SessionId = Guid.NewGuid().ToString();
             MissionStartTime = Time.time;
             SetPhase(Phase.Loading);
@@ -58,6 +64,9 @@ namespace MissionTrainer
         {
             if (Phase == Phase.GameOver) return;
             Sol++;
+            // The station decided last sol protects this sol.
+            if (WeatherStationOn) BuiltModules.Add(EventDirector.WeatherStation);
+            else BuiltModules.Remove(EventDirector.WeatherStation);
             Conditions = Services.Events.BeginSol(Sol, BuiltModules);
             Allocation = DefaultAllocation();
             SetPhase(Phase.Briefing);
@@ -80,6 +89,15 @@ namespace MissionTrainer
             return true;
         }
 
+        /// <summary>Turn the Weather Station on/off during allocation. Turning on needs 1 unused power unit.</summary>
+        public bool ToggleWeatherStation()
+        {
+            if (Phase != Phase.Allocate) return false;
+            if (!WeatherStationOn && UnusedPower < Scenario.weatherStationPowerCost) return false;
+            WeatherStationOn = !WeatherStationOn;
+            return true;
+        }
+
         public void CommitAllocation()
         {
             if (Phase != Phase.Allocate) return;
@@ -90,6 +108,7 @@ namespace MissionTrainer
         {
             SetPhase(Phase.Simulate);
             LastResult = ResourceModel.Simulate(Scenario, State, Allocation, Conditions);
+            LastResult.weatherStationOn = WeatherStationOn;
             yield return new WaitForSeconds(simulateSeconds);
             State = LastResult.after;
             History.Add(LastResult);
@@ -111,9 +130,16 @@ namespace MissionTrainer
                 after = (r != null ? r.after : State).Clone(),
                 outcome = r != null ? r.outcome : "ok",
             };
+            bool surprise = false;
             foreach (var e in Conditions.active)
+            {
                 if (e.known || phase == "debrief")
                     req.events.Add(new EventInfo { id = e.def.id, fact = e.def.fact });
+                if (!e.known) surprise = true;
+            }
+            // A storm nobody warned us about = the communication-delay lesson.
+            if (phase == "debrief" && surprise && !string.IsNullOrEmpty(Scenario.commsDelayFact))
+                req.events.Add(new EventInfo { id = "comms_delay", fact = Scenario.commsDelayFact });
 
             CommanderMessage = new CommanderReply { text = "...", tip = "", source = "local" };
             Services.Commander.GetMessage(req, reply =>
