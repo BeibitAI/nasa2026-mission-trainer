@@ -1,0 +1,44 @@
+# Redeploys the Render backend whenever backend code changes on main.
+# Render is connected via a public repo URL (no GitHub app), so it has no auto-deploy;
+# this calls Render's Deploy Hook instead. The hook URL is a secret: RENDER_DEPLOY_HOOK.
+name: Deploy backend to Render
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - "render.yaml"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: render-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Trigger Render deploy
+        env:
+          HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "::error::Secret RENDER_DEPLOY_HOOK is not set (Render -> service -> Settings -> Deploy Hook)."
+            exit 1
+          fi
+          curl -fsS -X POST "$HOOK" -o /dev/null
+          echo "Deploy triggered."
+
+      - name: Wait until the new version answers
+        run: |
+          sleep 60
+          for i in $(seq 1 20); do
+            if curl -fsS -m 30 https://mission-trainer-api.onrender.com/health; then echo; echo "Backend is up."; exit 0; fi
+            sleep 15
+          done
+          echo "::error::Backend did not answer /health after the deploy."
+          exit 1
