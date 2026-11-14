@@ -33,4 +33,25 @@ namespace MissionTrainer
 
         public SourceEntry Get(string id) => All().sources.FirstOrDefault(s => s.id == id);
     }
+
+    /// <summary>"Real science" cards (facts.json). Picks one that matches what just happened on the sol.</summary>
+    public static class RealScienceFacts
+    {
+        static FactList cache;
+
+        public static FactList All() => cache ??= ResourcesJson.Load<FactList>("facts") ?? new FactList();
+
+        /// <summary>Storm sol -> radiation card; low food -> greenhouse card; otherwise rotate through all cards.</summary>
+        public static FactCard Pick(SolResult r)
+        {
+            var facts = All().facts;
+            if (r == null || facts.Count == 0) return null;
+            string topic = r.conditions != null && r.conditions.radiationMultiplier > 1f ? "radiation"
+                : r.after != null && r.after.food < 50f ? "greenhouse"
+                : null;
+            var pool = topic == null ? facts : facts.Where(f => f.topic == topic).ToList();
+            if (pool.Count == 0) pool = facts;
+            return pool[Mathf.Abs(r.sol) % pool.Count];
+        }
+    }
 }

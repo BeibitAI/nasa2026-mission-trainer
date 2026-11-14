@@ -1,0 +1,49 @@
+{
+  "facts": [
+    {
+      "id": "moon_soil_plants",
+      "topic": "greenhouse",
+      "title": "Plants in Moon soil",
+      "text": "Scientists planted tiny plants in real Moon soil brought home by Apollo astronauts. The plants grew, but slowly, and many looked stressed. Space farmers will need to help their soil!",
+      "studyId": "OSD-476",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-476",
+      "sourceId": "osdr"
+    },
+    {
+      "id": "space_lettuce",
+      "topic": "greenhouse",
+      "title": "Lettuce from space",
+      "text": "Astronauts grew red romaine lettuce on the International Space Station. Scientists tested it back on Earth: it was safe to eat. Fresh salad in space is real!",
+      "studyId": "OSD-268",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-268",
+      "sourceId": "osdr"
+    },
+    {
+      "id": "seeds_cosmic_rays",
+      "topic": "radiation",
+      "title": "Seeds vs. cosmic rays",
+      "text": "About 580,000 seeds flew on a balloon high above Antarctica, where space radiation is strong. Fewer of them sprouted, and some had changed genes. That is why shields matter!",
+      "studyId": "OSD-210",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-210",
+      "sourceId": "osdr"
+    },
+    {
+      "id": "mice_in_orbit",
+      "topic": "body",
+      "title": "Mice in orbit",
+      "text": "Mice that lived 33 days on the space station lost muscle and bone, because floating takes less strength. Scientists are testing ways to keep astronauts strong.",
+      "studyId": "OSD-342",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-342",
+      "sourceId": "osdr"
+    },
+    {
+      "id": "mars_gravity",
+      "topic": "body",
+      "title": "Mars gravity",
+      "text": "On Mars you weigh only about 40% of your Earth weight. To learn what that does to muscles, scientists used soft harnesses so rats carried just 40% of their weight for 14 days.",
+      "studyId": "OSD-418",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-418",
+      "sourceId": "osdr"
+    }
+  ]
+}

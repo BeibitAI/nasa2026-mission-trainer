@@ -123,6 +123,11 @@ namespace MissionTrainer
                 if (!e.known && !string.IsNullOrEmpty(t.Scenario.commsDelayFact)) sb.AppendLine("Surprise! " + t.Scenario.commsDelayFact);
             }
             GUILayout.Label(sb.ToString(), box);
+
+            var fact = RealScienceFacts.Pick(r);
+            if (fact != null && GUILayout.Button($"Real science: {fact.title}\n{fact.text}\n(NASA OSDR {fact.studyId} - tap to open)", box)
+                && !string.IsNullOrEmpty(fact.url))
+                Application.OpenURL(fact.url);
         }
 
         void Bar(string label, float value, float max)

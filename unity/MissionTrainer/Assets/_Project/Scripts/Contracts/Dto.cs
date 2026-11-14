@@ -273,6 +273,26 @@ namespace MissionTrainer
         public List<SourceEntry> sources = new List<SourceEntry>();
     }
 
+    // ---------- Bundled config: Resources/Data/facts.json ("Real science" cards from NASA OSDR) ----------
+
+    [Serializable]
+    public class FactCard
+    {
+        public string id;
+        public string topic;      // greenhouse | radiation | body
+        public string title;
+        public string text;       // simple English, kids 7-12
+        public string studyId;    // e.g. OSD-476
+        public string url;        // OSDR study page
+        public string sourceId;   // key into sources.json
+    }
+
+    [Serializable]
+    public class FactList
+    {
+        public List<FactCard> facts = new List<FactCard>();
+    }
+
     [Serializable]
     public class FallbackLines
     {

@@ -8,6 +8,13 @@
       "usedFor": "The real solar storm of 11-12 Sep 2017 measured at Gale Crater: how much stronger radiation got each day."
     },
     {
+      "id": "osdr",
+      "title": "Open Science Data Repository (OSDR)",
+      "provider": "NASA",
+      "url": "https://osdr.nasa.gov/bio/repo/",
+      "usedFor": "\"Real science\" cards: 5 real space biology studies (plants in Moon soil, lettuce grown on the ISS, seeds vs. cosmic rays, mice in orbit, Mars gravity)."
+    },
+    {
       "id": "donki",
       "title": "Space Weather Database (DONKI)",
       "provider": "NASA CCMC / api.nasa.gov",
