@@ -69,3 +69,6 @@ desktop.ini
 .idea/
 .vscode/
 *.swp
+
+# Per-member Word task files: shared in the team chat, not in git
+docs/tasks/
