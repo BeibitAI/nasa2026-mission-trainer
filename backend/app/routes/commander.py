@@ -11,6 +11,7 @@ import asyncio
 import hashlib
 import json
 import random
+import re
 import time
 from collections import defaultdict, deque
 from typing import Literal
@@ -65,27 +66,107 @@ class CommanderReply(BaseModel):
 # ---------- prompt ----------
 
 SYSTEM_PROMPT = """You are "Commander Nova", a warm, upbeat mission commander talking to a child (age 7-12)
-who is running a small base on {place}. Rules:
-- Very simple English a 7-year-old can follow: short sentences, everyday words, no jargon
-  (if you must use a science word like "radiation" or "sol", explain it in 3-5 words).
-- Use ONLY the numbers and facts given in the input. Never invent data, dates or statistics.
-- Explain WHY things changed: connect the player's power choices to what happened.
-- Never scary or gloomy. Mistakes are learning moments.
-- "text": at most 35 words. "tip": one actionable suggestion for the next sol, at most 15 words.
+who is running a small base on {place}.
+
+GAME RULES (the only truth - never contradict them):
+- Every sol (a Mars day) the player shares 10 power units between Life Support (air and water),
+  Greenhouse (food), Storm Shield and Science.
+- Life Support needs 3 units to keep air steady, the Greenhouse needs 2 to keep food steady.
+  More makes the bar go up, less makes it drop fast.
+- Everyday space radiation (cosmic rays) is always there: the dose goes up a little EVERY sol and
+  the shield CANNOT stop it. On a calm sol, never suggest using the shield - that wastes power.
+- The Storm Shield only helps during a solar storm: it blocks part of the extra storm radiation.
+- Science means working outside. During a solar storm, outside work adds extra radiation.
+- A dust storm blocks sunlight, so the base gets only half the power.
+- Radio from Earth takes 4 to 24 minutes, so Earth's storm warnings can come too late.
+  A Weather Station costs 1 power every sol and warns about storms one sol early.
+- The mission lasts 14 sols. To win: keep air and food above 0, keep the dose under 100,
+  and reach 32 science points. Nobody wins before the end of sol 14, even with 32 points already.
+
+HOW TO ANSWER:
+- Very simple English a 7-year-old can follow: short sentences, everyday words, no jargon.
+  If you use a science word like "radiation", explain it in 3-5 words.
+- Use ONLY the numbers and facts in the input. Never invent data, dates or statistics.
+- Follow the "task" field in the input exactly.
+- Be kind and encouraging, never scary: no words about illness, injury or death.
+- Vary your first words; do not start with "Great job" every time.
+- "text": 2-3 short sentences, at most 30 words. "tip": one concrete suggestion, at most 12 words.
 Reply as JSON: {{"text": "...", "tip": "..."}}"""
+
+STORM_IDS = {"solar_storm"}
+DUST_IDS = {"dust_storm"}
+
+
+def _task(req: CommanderRequest, storm: bool, dust: bool, surprise: bool) -> str:
+    if req.phase == "briefing":
+        if storm:
+            return ("Morning briefing. The player has NOT chosen yet. Warn that a solar storm is coming today: "
+                    "suggest more Storm Shield and less outside Science today. Do not praise or judge any choice.")
+        if dust:
+            return ("Morning briefing. The player has NOT chosen yet. Say a dust storm means only half the power today: "
+                    "keep Life Support and Greenhouse fed first. Do not praise or judge any choice.")
+        return ("Morning briefing. The player has NOT chosen yet. Briefly say how the base is doing and what to "
+                "think about today (lowest bar, science goal). Calm sol: no storm, so the shield is not needed. "
+                "Do not praise or judge any choice.")
+    if req.outcome == "win":
+        return ("The mission is over and the player WON. Celebrate the whole 14-sol mission. "
+                "Tip: invite them to play again and try a different strategy. Do not give advice for tomorrow.")
+    if req.outcome == "fail":
+        return ("The mission is over: the player lost (see failReason). Kindly explain the main reason in one sentence, "
+                "using the rules. Tip: one idea for their NEXT MISSION (not tomorrow).")
+    parts = ["Debrief after the sol. Explain WHY the bars changed, using the power choice and the rules."]
+    a = req.after
+    danger = ("air" if a.air < 30 else "food" if a.food < 30 else "radiation dose" if a.dose > 70 else None)
+    if req.outcome == "warning" and danger:
+        parts.append(f"Gently warn that the {danger} is getting close to the limit; that is the most important point.")
+    if a.science >= 32:
+        parts.append("The science goal is already reached, but the mission is not won yet: "
+                     "now the job is to stay safe until the end of sol 14.")
+    if surprise:
+        parts.append("The storm was a surprise because Earth's warning came too late (radio delay). "
+                     "Mention that a Weather Station would have warned them.")
+    elif storm:
+        parts.append("There was a solar storm: say how the shield and outside science affected the dose.")
+    elif dust:
+        parts.append("A dust storm cut the power in half: that is why there was less to share.")
+    else:
+        parts.append("Calm sol: the small dose rise is everyday radiation the shield cannot stop. "
+                     "Do not tell the player to use the shield.")
+    parts.append("Tip: one suggestion for the next sol.")
+    return " ".join(parts)
+
+
+def _fail_reason(req: CommanderRequest) -> str | None:
+    a = req.after
+    if a.air <= 0:
+        return "air ran out"
+    if a.food <= 0:
+        return "food ran out"
+    if a.dose >= 100:
+        return "radiation dose reached 100, the crew must go home"
+    if req.outcome == "fail":
+        return "the 14 sols ended before reaching 32 science points"
+    return None
 
 
 def build_user_prompt(req: CommanderRequest) -> str:
-    d = {
-        "phase": req.phase,
-        "sol": req.sol,
-        "powerChoice": req.allocation.model_dump(),
-        "before": req.before.model_dump(),
-        "after": req.after.model_dump(),
-        "events": [e.model_dump() for e in req.events],
-        "outcome": req.outcome,
-        "barsMeaning": "air/food 0-100 (0 = mission over), dose 0-100 (100 = crew must go home), science = points toward goal",
-    }
+    ids = {e.id for e in req.events}
+    storm, dust, surprise = bool(ids & STORM_IDS), bool(ids & DUST_IDS), "comms_delay" in ids
+    d: dict = {"task": _task(req, storm, dust, surprise), "sol": req.sol, "solsInMission": 14}
+    if req.phase == "briefing":
+        # The allocation sent with a briefing is only the default, not a choice -> leave it out.
+        d["baseNow"] = req.before.model_dump()
+    else:
+        b, a = req.before, req.after
+        d["powerChoice"] = req.allocation.model_dump()
+        d["before"] = b.model_dump()
+        d["after"] = a.model_dump()
+        d["change"] = {k: round(getattr(a, k) - getattr(b, k), 1) for k in ("air", "food", "dose", "science")}
+        d["outcome"] = req.outcome
+        if req.outcome == "fail":
+            d["failReason"] = _fail_reason(req)
+    d["events"] = [e.model_dump() for e in req.events]
+    d["bars"] = "air and food: 0-100 (0 = mission over); dose: 0-100 (100 = crew must go home); science: goal 32"
     return json.dumps(d)
 
 
@@ -180,7 +261,19 @@ async def ask_gemini(req: CommanderRequest) -> CommanderReply | None:
     text, tip = str(data.get("text", "")).strip(), str(data.get("tip", "")).strip()
     if not text:
         return None
-    return CommanderReply(text=text[:300], tip=tip[:120], source="gemini")
+    return CommanderReply(text=_clip(text, 35), tip=_clip(tip, 15), source="gemini")
+
+
+def _clip(s: str, max_words: int) -> str:
+    """Keep whole sentences that fit in max_words (fallback: hard word cut)."""
+    if len(s.split()) <= max_words:
+        return s
+    out = ""
+    for sent in re.split(r"(?<=[.!?])\s+", s):
+        if len((out + " " + sent).split()) > max_words:
+            break
+        out = (out + " " + sent).strip()
+    return out or " ".join(s.split()[:max_words]) + "..."
 
 
 @router.post("/commander", response_model=CommanderReply)
