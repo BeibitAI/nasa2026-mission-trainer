@@ -38,6 +38,13 @@
     .src:hover { border-color: var(--mars); }
     .src small { color: var(--mars-2); }
     footer { padding: 28px 0 48px; color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); }
+    .ds .wrap > h3 { margin: 26px 0 10px; font-size: 20px; }
+    .ds .num { color: var(--ok); font-weight: 700; }
+    .ds ul { margin: 0; padding-left: 20px; color: var(--muted); }
+    .ds li { margin: 6px 0; }
+    .ds li b { color: var(--text); }
+    .ds .card p + p { margin-top: 8px; }
+    .ds code { background: #241e2c; padding: 1px 6px; border-radius: 6px; font-size: 14px; }
   </style>
 </head>
 <body>
@@ -81,6 +88,67 @@
         <p class="lead">Real NASA measurements, simplified so the game is fun to play.
           These are the sources the game actually uses:</p>
         <div class="grid" id="sources" style="margin-top:16px"></div>
+      </div>
+    </section>
+
+    <section id="data-science" class="ds">
+      <div class="wrap">
+        <h2>Data &amp; Science</h2>
+        <p class="lead">How each NASA dataset changes what happens in the game, and what we simplified for players aged 7–12.</p>
+
+        <h3>How the real data drives the game</h3>
+        <div class="grid">
+          <div class="card">
+            <h3>The solar storm is real</h3>
+            <p>On 11–12 September 2017 NASA's Curiosity rover (RAD instrument, Gale Crater) measured the radiation dose rate
+              jump to <span class="num">2.29×</span> and then <span class="num">1.65×</span> its quiet level
+              (daily means; quiet level ≈ 7.8 µGy/h).</p>
+            <p>The game's storm uses exactly these numbers. A storm that arrives with no warning uses the real peak hour:
+              <span class="num">2.77×</span> (21.6 µGy/h).</p>
+          </div>
+          <div class="card">
+            <h3>Today's real Sun</h3>
+            <p>Our server reads NASA DONKI (solar eruptions, geomagnetic storms, particle events from the last 30 days).
+              Medium risk makes storms <span class="num">1.2×</span> more likely in your mission, high risk <span class="num">1.5×</span>.</p>
+            <p>If the server can't be reached, the game uses a saved copy and says “data as of &lt;date&gt;” — it never shows old data as live.</p>
+          </div>
+          <div class="card">
+            <h3>Messages are slow</h3>
+            <p>Radio signals take about 4 to 24 minutes between Earth and Mars, so a storm warning from Earth can come too late.</p>
+            <p>That is the Weather Station choice: it costs power every sol, but warns you a sol early.</p>
+          </div>
+          <div class="card">
+            <h3>Dust stops solar power</h3>
+            <p>In 2018 a planet-wide dust storm stopped NASA's solar-powered Opportunity rover from recharging.</p>
+            <p>In the game a dust storm halves your power for that sol.</p>
+          </div>
+          <div class="card">
+            <h3>Real space biology</h3>
+            <p>After each sol a “Real science” card shares a study from NASA's Open Science Data Repository:
+              plants in Apollo Moon soil (OSD-476), lettuce grown on the ISS (OSD-268), seeds vs. cosmic rays (OSD-210),
+              mice in orbit (OSD-342) and Mars gravity (OSD-418).</p>
+          </div>
+          <div class="card">
+            <h3>A radiation limit</h3>
+            <p>Real astronauts have a career radiation limit (NASA-STD-3001). In the game, a full dose bar means the crew must go home.</p>
+          </div>
+        </div>
+
+        <h3>What we simplified</h3>
+        <ul>
+          <li><b>Dose is in game points, not sieverts.</b> The bar goes from 0 to 100. Storm strength (how many times above normal) is real; the size of one sol's dose is tuned so a 14-sol game is fair and fun.</li>
+          <li><b>The shield only blocks storm radiation.</b> Most everyday radiation on Mars comes from very energetic galactic cosmic rays, which are hard to block. Solar-storm particles carry less energy, so shelter helps much more. The game turns this into one simple rule.</li>
+          <li><b>Science means working outside.</b> During a storm, outside work adds extra dose — the reason real crews would wait in a shelter.</li>
+          <li><b>Things happen faster.</b> Every 14-sol mission has the real 2017 storm once, so every player sees real data.</li>
+          <li><b>Four systems stand for many.</b> Life support, greenhouse, shield and science represent many real machines and tasks.</li>
+          <li><b>The AI Commander only rephrases.</b> Google Gemini turns the game's own numbers into short, friendly explanations. It is told not to invent facts; if it is unavailable, pre-written texts are used.</li>
+        </ul>
+
+        <h3>Check it yourself</h3>
+        <p class="lead">The script that downloads the Curiosity data from the NASA OSDR RadLab API and computes these numbers is
+          <a href="https://github.com/BeibitAI/nasa2026-mission-trainer/blob/main/data-pipeline/fetch_radlab.py">data-pipeline/fetch_radlab.py</a>.
+          All game rules are in the
+          <a href="https://github.com/BeibitAI/nasa2026-mission-trainer/blob/main/unity/MissionTrainer/Assets/_Project/Resources/Data/scenario_mars.json">scenario file</a>.</p>
       </div>
     </section>
 
