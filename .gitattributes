@@ -1,0 +1,40 @@
+# Normalize text line endings
+* text=auto
+
+# Unity YAML (Force Text serialization) — keep LF, treat as text
+*.unity   text eol=lf linguist-generated
+*.prefab  text eol=lf linguist-generated
+*.asset   text eol=lf linguist-generated
+*.mat     text eol=lf linguist-generated
+*.anim    text eol=lf linguist-generated
+*.controller text eol=lf linguist-generated
+*.meta    text eol=lf linguist-generated
+*.cs      text eol=lf diff=csharp
+
+# ---------------------------------------------------------------
+# Git LFS — ONLY inside unity/ and art-source/.
+# web/ must NOT use LFS: GitHub Pages serves LFS pointer files, not content.
+# ---------------------------------------------------------------
+unity/**/*.fbx   filter=lfs diff=lfs merge=lfs -text
+unity/**/*.FBX   filter=lfs diff=lfs merge=lfs -text
+unity/**/*.obj   filter=lfs diff=lfs merge=lfs -text
+unity/**/*.glb   filter=lfs diff=lfs merge=lfs -text
+unity/**/*.png   filter=lfs diff=lfs merge=lfs -text
+unity/**/*.jpg   filter=lfs diff=lfs merge=lfs -text
+unity/**/*.jpeg  filter=lfs diff=lfs merge=lfs -text
+unity/**/*.tga   filter=lfs diff=lfs merge=lfs -text
+unity/**/*.psd   filter=lfs diff=lfs merge=lfs -text
+unity/**/*.exr   filter=lfs diff=lfs merge=lfs -text
+unity/**/*.tif   filter=lfs diff=lfs merge=lfs -text
+unity/**/*.raw   filter=lfs diff=lfs merge=lfs -text
+unity/**/*.wav   filter=lfs diff=lfs merge=lfs -text
+unity/**/*.mp3   filter=lfs diff=lfs merge=lfs -text
+unity/**/*.ogg   filter=lfs diff=lfs merge=lfs -text
+unity/**/*.ttf   filter=lfs diff=lfs merge=lfs -text
+unity/**/*.otf   filter=lfs diff=lfs merge=lfs -text
+
+art-source/**/*.blend filter=lfs diff=lfs merge=lfs -text
+art-source/**/*.fbx   filter=lfs diff=lfs merge=lfs -text
+art-source/**/*.png   filter=lfs diff=lfs merge=lfs -text
+art-source/**/*.jpg   filter=lfs diff=lfs merge=lfs -text
+art-source/**/*.tif   filter=lfs diff=lfs merge=lfs -text
