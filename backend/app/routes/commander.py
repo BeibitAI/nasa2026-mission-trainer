@@ -71,19 +71,20 @@ who is running a small base on {place}.
 
 GAME RULES (the only truth - never contradict them):
 - Every sol (a Mars day) the player shares 10 power units between Life Support (air and water),
-  Greenhouse (food), Storm Shield and Science.
+  Greenhouse (food), Storm Shield and the Rover (called "science" in the input).
 - Life Support needs 3 units to keep air steady, the Greenhouse needs 2 to keep food steady.
   More makes the bar go up, less makes it drop fast.
 - Everyday space radiation (cosmic rays) is always there: the dose goes up a little EVERY sol and
   the shield CANNOT stop it. On a calm sol, never suggest using the shield - that wastes power.
 - The Storm Shield only helps during a solar storm: it blocks part of the extra storm radiation.
-- Science means working outside: every Science unit adds a little dose on any sol, and much more
-  during a solar storm. When the dose is high, the fix is less Science - not the shield.
+- Rover trips: an astronaut drives the rover outside to collect rock samples. Each power unit = 1 sample,
+  and the samples are sent to Earth by rocket. Every rover unit adds a little dose on any sol, and much
+  more during a solar storm. When the dose is high, the fix is fewer rover trips - not the shield.
 - A dust storm blocks sunlight, so the base gets only half the power.
 - Radio from Earth takes 4 to 24 minutes, so Earth's storm warnings can come too late.
   A Weather Station costs 1 power every sol and warns about storms one sol early.
 - The mission lasts 14 sols. To win: keep air and food above 0, keep the dose under 100,
-  and reach 32 science points. Nobody wins before the end of sol 14, even with 32 points already.
+  and send 32 rock samples to Earth. Nobody wins before the end of sol 14, even with 32 samples already.
 
 HOW TO ANSWER:
 - Very simple English a 7-year-old can follow: short sentences, everyday words, no jargon.
@@ -98,7 +99,7 @@ HOW TO ANSWER:
 LANG_RULES = {
     "en": "",
     "ru": ("LANGUAGE: write \"text\" and \"tip\" in simple Russian for a child, address the player as \"ты\". "
-           "Use these game words: сол, Жизнеобеспечение, Теплица, Щит от бури, Наука, Метеостанция, доза радиации. "
+           "Use these game words: сол, Жизнеобеспечение, Теплица, Щит от бури, Марсоход, образцы пород, Метеостанция, доза радиации. "
            "A power unit is \"единица энергии\" (never узел, топливо or силы). "
            "Write the day as \"сол 6\" or \"на 6-м соле\"; plural is \"14 солов\"; never invent words. "
            "Do not start with \"Привет\" or \"Отличная работа\"; praise only a good choice. "
@@ -113,12 +114,12 @@ def _task(req: CommanderRequest, storm: bool, dust: bool, surprise: bool) -> str
     if req.phase == "briefing":
         if storm:
             return ("Morning briefing. The player has NOT chosen yet. Warn that a solar storm is coming today: "
-                    "suggest more Storm Shield and less outside Science today. Do not praise or judge any choice.")
+                    "suggest more Storm Shield and fewer rover trips today. Do not praise or judge any choice.")
         if dust:
             return ("Morning briefing. The player has NOT chosen yet. Say a dust storm means only half the power today: "
                     "keep Life Support and Greenhouse fed first. Do not praise or judge any choice.")
         return ("Morning briefing. The player has NOT chosen yet. Briefly say how the base is doing and what to "
-                "think about today (lowest bar, science goal). Calm sol: no storm, so the shield is not needed. "
+                "think about today (lowest bar, rock sample goal). Calm sol: no storm, so the shield is not needed. "
                 "Do not praise or judge any choice.")
     if req.outcome == "win":
         return ("The mission is over and the player WON. Celebrate the whole 14-sol mission. "
@@ -132,19 +133,21 @@ def _task(req: CommanderRequest, storm: bool, dust: bool, surprise: bool) -> str
     if req.outcome == "warning" and danger:
         parts.append(f"Gently warn that the {danger} is getting close to the limit; that is the most important point.")
         if danger == "radiation dose":
-            parts.append("Tip: suggest less outside Science to slow the dose (not the shield, not more Science).")
+            parts.append("Tip: suggest fewer rover trips to slow the dose (not the shield, not more rover trips).")
     if a.science >= 32:
-        parts.append("The science goal is already reached, but the mission is not won yet: "
+        parts.append("The 32-sample goal is already reached, but the mission is not won yet: "
                      "now the job is to stay safe until the end of sol 14.")
     if surprise:
         parts.append("The storm was a surprise because Earth's warning came too late (radio delay). "
                      "Mention that a Weather Station would have warned them.")
     elif storm:
-        parts.append("There was a solar storm: say how the shield and outside science affected the dose.")
+        parts.append("There was a solar storm. The shield only LOWERS the storm dose; a rover trip ADDS dose. "
+                     "Say correctly what the shield and the rover did today.")
     elif dust:
         parts.append("A dust storm cut the power in half: that is why there was less to share.")
     else:
-        parts.append("Calm sol: the small dose rise is everyday radiation the shield cannot stop. "
+        parts.append("Calm sol: the dose rise is everyday radiation plus any rover trip; the shield did nothing "
+                     "today (it never adds dose). "
                      "Do not tell the player to use the shield.")
     parts.append("Tip: one suggestion for the next sol.")
     return " ".join(parts)
@@ -159,7 +162,7 @@ def _fail_reason(req: CommanderRequest) -> str | None:
     if a.dose >= 100:
         return "radiation dose reached 100, the crew must go home"
     if req.outcome == "fail":
-        return "the 14 sols ended before reaching 32 science points"
+        return "the 14 sols ended before 32 rock samples were sent to Earth"
     return None
 
 
@@ -180,7 +183,7 @@ def build_user_prompt(req: CommanderRequest) -> str:
         if req.outcome == "fail":
             d["failReason"] = _fail_reason(req)
     d["events"] = [e.model_dump() for e in req.events]
-    d["bars"] = "air and food: 0-100 (0 = mission over); dose: 0-100 (100 = crew must go home); science: goal 32"
+    d["bars"] = "air and food: 0-100 (0 = mission over); dose: 0-100 (100 = crew must go home); science = rock samples sent to Earth, goal 32"
     return json.dumps(d)
 
 
@@ -218,14 +221,14 @@ def _cache_key(req: CommanderRequest) -> str:
 # ---------- fallback ----------
 
 FALLBACK = {
-    "win": [("Mission complete! You kept the crew safe and finished the science. Real mission planners would be proud!",
+    "win": [("Mission complete! You kept the crew safe and sent the rock samples to Earth. Real mission planners would be proud!",
              "Try again with a different strategy!")],
     "fail": [("The base ran out of something important. That's how real planners learn: every resource matters.",
               "Next time, keep an eye on the lowest bar.")],
     "warning": [("Careful, Commander! One of our bars is getting low. Every power choice has a cost.",
                  "Give a little more power to the lowest bar.")],
     "ok": [("Nice work! The base is running smoothly and the crew is happy.",
-            "Could you spare one power unit for science?")],
+            "Could you spare one power unit for a rover trip?")],
     "briefing": [("Good morning, Commander! You have 10 power units today. How will you share them?",
                   "Life support keeps the crew breathing. Start there.")],
 }

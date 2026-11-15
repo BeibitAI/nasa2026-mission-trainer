@@ -11,7 +11,7 @@ const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 const params = new URLSearchParams(location.search);
 const OFFLINE = params.has("offline");
 
-const ICONS = { lifeSupport: "💨", greenhouse: "🌱", shield: "🛡️", science: "🔬" };
+const ICONS = { lifeSupport: "💨", greenhouse: "🌱", shield: "🛡️", science: "🚙" };
 
 let D = {};             // loaded data
 let G = null;           // current game
@@ -58,6 +58,7 @@ function newGame() {
     station: false,        // powered this sol
     stationFrom: Infinity, // first sol the station gives warnings
     alloc: null, cond: null, result: null, history: [], phase: "allocate", reqId: 0,
+    roverSeen: false,      // the Perseverance card is shown after the first rover trip
   };
   startSol(1);
 }
@@ -91,6 +92,8 @@ function startSol(sol) {
 function runSol() {
   if (G.phase !== "allocate") return;
   G.result = simulate(D.scenario, G.state, G.alloc, G.cond);
+  G.result.roverFact = G.alloc.science > 0 && !G.roverSeen;
+  if (G.result.roverFact) G.roverSeen = true;
   G.history.push(G.result);
   G.phase = "simulate";
   render();
@@ -297,12 +300,16 @@ function renderScene() {
     <!-- storm shield -->
     ${shieldOp ? `<ellipse cx="330" cy="250" rx="118" ry="88" fill="#9d8cff" fill-opacity="${shieldOp.toFixed(2)}" stroke="#c4b9ff" stroke-width="2" stroke-dasharray="6 5"/>` : ""}
 
-    <!-- astronaut doing science -->
-    ${a.science > 0 ? `<g transform="translate(540 232)"><g class="walker">
-        <circle cx="0" cy="0" r="7" fill="#f4f4f4"/><circle cx="2" cy="-1" r="4" fill="#3a4a6a"/>
-        <rect x="-6" y="6" width="12" height="15" rx="4" fill="#f4f4f4"/>
-        <rect x="-5" y="20" width="4" height="9" fill="#ddd"/><rect x="1" y="20" width="4" height="9" fill="#ddd"/>
-        <rect x="-10" y="8" width="4" height="9" rx="2" fill="#ccc"/>
+    <!-- rover trip for rock samples (astronaut driving) -->
+    ${a.science > 0 ? `<g transform="translate(560 240)"><g class="walker">
+        <circle cx="-4" cy="-14" r="6" fill="#f4f4f4"/><circle cx="-2" cy="-15" r="3.4" fill="#3a4a6a"/>
+        <rect x="-9" y="-9" width="10" height="9" rx="3" fill="#f4f4f4"/>
+        <rect x="-22" y="-2" width="44" height="10" rx="3" fill="#e9e2d6" stroke="#8a8077" stroke-width="1.5"/>
+        <rect x="8" y="-8" width="11" height="7" rx="2" fill="#5b6f8f"/>
+        <line x1="16" y1="-8" x2="16" y2="-20" stroke="#ccc" stroke-width="1.5"/><circle cx="16" cy="-21" r="2" fill="#ff9a5c"/>
+        <circle cx="-14" cy="11" r="6" fill="#333" stroke="#777" stroke-width="2"/>
+        <circle cx="0" cy="11" r="6" fill="#333" stroke="#777" stroke-width="2"/>
+        <circle cx="14" cy="11" r="6" fill="#333" stroke="#777" stroke-width="2"/>
       </g></g>` : ""}
 
     ${dustLines}
@@ -314,7 +321,8 @@ function renderScene() {
   if (!solar && !dust) tags.push(`<span class="tag">${t.tagCalm}</span>`);
   if (station) tags.push(`<span class="tag station">${t.tagStation}${hasStation(G.sol + 1) && !hasStation(G.sol) ? t.tagStationNext : ""}</span>`);
   $("sceneTags").innerHTML = tags.join("");
-  S3?.update({ solar, dust, solarFactor: sf, shield: a.shield, station, science: a.science });
+  S3?.update({ solar, dust, solarFactor: sf, shield: a.shield, station, science: a.science,
+    phase: G.phase, launch: G.phase === "simulate" && a.science > 0 });
 }
 
 function renderPanel() {
@@ -408,6 +416,7 @@ function debriefHtml() {
     `${t.whyEveryday(r1(everyday))}${storm > 0 ? `${t.whyStorm(r1(stormExtra))}${r.shieldReduction > 0 ? t.whyBlocked(Math.round(r.shieldReduction * 100)) : t.whyNoShield}` : ""}${outside > 0 ? t.whyOutside(r1(outside)) : ""}.`,
   ];
   if (storm === 0 && a.shield > 0) why.push(t.whyCalmShield);
+  if (d("science") > 0) why.push(t.whySamples(d("science"), r.after.science, s.science.goal));
 
   const events = r.conditions.active.map((ev) => {
     const real = ev.def.useRealRadiationProfile;
@@ -419,7 +428,11 @@ function debriefHtml() {
   }).join("");
 
   const raw = pickFact(D.facts.facts, r), f = raw && tr.fact(raw);
-  const fact = f ? `<a class="science-card" href="${esc(f.url)}" target="_blank" rel="noopener">
+  const rover = r.roverFact && srcById("mars_samples");
+  const fact = rover ? `<a class="science-card" href="${esc(rover.url)}" target="_blank" rel="noopener">
+      <div class="k">${t.realRover}</div><h3>${esc(t.roverFactTitle)}</h3><p>${esc(t.roverFact)}</p>
+      <div class="src">${esc(t.source(rover.provider, tr.source(rover).title))} ↗</div></a>`
+    : f ? `<a class="science-card" href="${esc(f.url)}" target="_blank" rel="noopener">
       <div class="k">${t.realScience}</div><h3>${esc(f.title)}</h3><p>${esc(f.text)}</p>
       <div class="src">${esc(t.osdrStudy(f.studyId))}</div></a>` : "";
 

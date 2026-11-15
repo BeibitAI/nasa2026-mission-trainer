@@ -1,7 +1,7 @@
 # Sol by Sol: Mars Base Trainer
 
 A free browser game for kids aged 7–12: run a small base in Gale Crater on Mars, one sol (Mars day) at a time.
-Share power between life support, the greenhouse, a storm shield and science — while real NASA data decides
+Share power between life support, the greenhouse, a storm shield and rover trips for rock samples — while real NASA data decides
 when the storms come. Built by Team BeibitAI (Kazakhstan) for the NASA Space Apps Challenge 2026,
 challenge [Build a Junior Astronaut Mission Trainer](https://www.spaceappschallenge.org/2026/challenges/junior-astronaut-mission-trainer/).
 

@@ -19,14 +19,15 @@
     "We ran out of something important. Every resource matters on Mars."
   ],
   "win": [
-    "Mission complete! You kept the crew safe AND finished the science. Amazing!",
+    "Mission complete! You kept the crew safe AND sent the rock samples to Earth. Amazing!",
     "You did it, Commander! That's exactly how real mission planners think."
   ],
   "tips": [
     "Life support keeps the crew breathing. Never let it run out!",
     "The greenhouse grows food, but it needs power every sol.",
     "The storm shield blocks the extra radiation from solar storms. Radiation is invisible energy from space.",
-    "Science is why we came, but the crew must stay safe first.",
+    "The rover brings back rock samples. That is why we came, but the crew must stay safe first.",
+    "A rover trip during a solar storm adds radiation. Stay home when a storm comes.",
     "A dust storm means less sunlight, so less solar power.",
     "NASA sets a limit on how much radiation an astronaut may get in a whole career.",
     "Radio from Earth takes minutes to reach Mars. A Weather Station warns you faster.",

@@ -36,6 +36,13 @@
       "usedFor": "Why dust storms cut solar power."
     },
     {
+      "id": "mars_samples",
+      "title": "Mars Rock Samples",
+      "provider": "NASA",
+      "url": "https://science.nasa.gov/mission/mars-2020-perseverance/mars-rock-samples/",
+      "usedFor": "The rover: the real Perseverance rover seals rock samples in tubes so they can be returned to labs on Earth."
+    },
+    {
       "id": "nasa_std_3001",
       "title": "Astronaut radiation limit (NASA-STD-3001)",
       "provider": "NASA",

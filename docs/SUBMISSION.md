@@ -22,7 +22,7 @@
 
 ## High-Level Project Summary
 
-> Sol by Sol is a free browser game for kids aged 7–12 that turns them into the commander of a small base in Gale Crater on Mars. Every sol (a Mars day), the player splits 10 power units between life support, the greenhouse, a storm shield and science. Dust storms cut solar power, and solar storms raise radiation — and the storm in the game is real: it uses the radiation that NASA's Curiosity rover measured at Gale Crater on 11–12 September 2017. Because radio messages take 4–24 minutes to cross from Earth, players must decide whether to pay power for a local Weather Station that warns them in time. Live NASA DONKI space-weather data changes how likely storms are, and a friendly AI Commander explains in simple words why each choice led to what happened. There is no free safe choice: kids learn the real trade-offs mission planners face, and see the NASA data behind every event.
+> Sol by Sol is a free browser game for kids aged 7–12 that turns them into the commander of a small base in Gale Crater on Mars. Every sol (a Mars day), the player splits 10 power units between life support, the greenhouse, a storm shield and rover trips that collect rock samples to send to Earth. Dust storms cut solar power, and solar storms raise radiation — and the storm in the game is real: it uses the radiation that NASA's Curiosity rover measured at Gale Crater on 11–12 September 2017. Because radio messages take 4–24 minutes to cross from Earth, players must decide whether to pay power for a local Weather Station that warns them in time. Live NASA DONKI space-weather data changes how likely storms are, and a friendly AI Commander explains in simple words why each choice led to what happened. There is no free safe choice: kids learn the real trade-offs mission planners face, and see the NASA data behind every event.
 
 ---
 
@@ -42,24 +42,24 @@ https://beibitai.github.io/nasa2026-mission-trainer/
 
 > **What it does**
 >
-> Sol by Sol is a turn-based base-management game that runs in any modern browser, on a computer or a phone, with no download or sign-up. It is available in English and Russian (one button switches the language, including Commander Nova's AI replies). The player survives a 14-sol mission at Gale Crater, Mars, and must reach a science goal.
+> Sol by Sol is a turn-based base-management game that runs in any modern browser, on a computer or a phone, with no download or sign-up. It is available in English and Russian (one button switches the language, including Commander Nova's AI replies). The player survives a 14-sol mission at Gale Crater, Mars, and must send 32 rock samples to Earth.
 >
 > Each sol has four steps:
 > 1. **Briefing** – Commander Nova reports the base status and space weather.
-> 2. **Share the power** – 10 power units go to Life Support (air and water), Greenhouse (food), Storm Shield and Science. A dust storm halves the power.
+> 2. **Share the power** – 10 power units go to Life Support (air and water), Greenhouse (food), Storm Shield and the Rover (an astronaut drives out for rock samples; a rocket sends them to Earth). A dust storm halves the power.
 > 3. **The sol happens** – the base reacts to events: dust storms, and a solar particle storm based on real Curiosity measurements.
 > 4. **Debrief** – the Commander explains *why* the bars changed, and a "Real science" card shares a real NASA space-biology study.
 >
 > **Real trade-offs, no free safe choice**
 >
-> Every unit of power has a cost. Shielding every sol wastes power and the science goal is missed. Never shielding lets a storm push the radiation dose over the limit. Science counts as work outside, so it becomes risky during storms. We tested the rules with a simulation of 3,000 random missions: putting the same split every sol wins only 47% of the time, while reacting to storm warnings (shield up, stay inside) with the Weather Station on wins 92%. Without the station, the first storm day is a surprise and the win rate drops to 27% — the game's way of teaching the communication delay between Earth and Mars.
+> Every unit of power has a cost. Shielding every sol wastes power and the sample goal is missed. Never shielding lets a storm push the radiation dose over the limit. Rover trips count as work outside, so they become risky during storms. We tested the rules with a simulation of 3,000 random missions: putting the same split every sol wins only 47% of the time, while reacting to storm warnings (shield up, stay inside) with the Weather Station on wins 92%. Without the station, the first storm day is a surprise and the win rate drops to 27% — the game's way of teaching the communication delay between Earth and Mars.
 >
 > **How NASA data drives the game**
 >
 > - **Curiosity RAD (via NASA OSDR RadLab API):** the solar storm uses the real daily dose rates at Gale Crater on 11–12 Sep 2017 – 2.29× and 1.65× the quiet level (≈ 7.8 µGy/h). A storm that arrives without warning uses the real peak hour, 2.77×.
 > - **NASA DONKI:** our server reads the last 30 days of solar eruptions (CME), geomagnetic storms and particle events. Medium or high real-world risk makes storms 1.2× or 1.5× more likely in the player's mission. If live data is unavailable, a saved copy is used and labelled "data as of <date>" — saved data is never shown as live.
 > - **NASA OSDR:** five "Real science" cards from studies OSD-476 (plants grown in Apollo lunar soil), OSD-268 (lettuce grown on the ISS), OSD-210 (seeds exposed to cosmic radiation), OSD-342 (mice on the ISS losing muscle and bone) and OSD-418 (Mars-gravity muscle study).
-> - **NASA sources** for the communication delay (4–24 minutes), the 2018 dust storm that silenced the Opportunity rover, and the astronaut radiation limit (NASA-STD-3001).
+> - **NASA sources** for rock sample return (Perseverance seals rock cores in tubes for return to Earth), the communication delay (4–24 minutes), the 2018 dust storm that silenced the Opportunity rover, and the astronaut radiation limit (NASA-STD-3001).
 >
 > Every source is listed inside the game (the "Data sources" button) and on our website, with links. Each storm card in the game shows the real number for that day (for example, "×2.3 normal radiation, Curiosity daily average, 11 Sep 2017") with a link to its source. The website also explains, in a "Data & Science" section, exactly what we simplified (for example: dose is shown in game points, not sieverts; storm strength is real).
 >
@@ -110,7 +110,8 @@ https://beibitai.github.io/nasa2026-mission-trainer/
 > 4. **NASA – Space Communications: 7 Things You Need to Know** (Earth–Mars signal delay). https://www.nasa.gov/missions/tech-demonstration/space-communications-7-things-you-need-to-know/
 > 5. **NASA – Opportunity rover mission comes to end** (2018 planet-wide dust storm). https://www.nasa.gov/news-release/nasas-record-setting-opportunity-rover-mission-on-mars-comes-to-end/
 > 6. **NASA-STD-3001 radiation protection technical brief** (astronaut radiation limit). https://www.nasa.gov/wp-content/uploads/2023/03/radiation-protection-technical-brief-ochmo.pdf
-> 7. *(Processed, planned for the Moon scenario, not in the Mars game yet)* **LRO CRaTER** dose data from the same September 2017 event, via the OSDR RadLab API.
+> 7. **NASA – Mars Rock Samples** (Perseverance sample tubes, planned return to Earth). https://science.nasa.gov/mission/mars-2020-perseverance/mars-rock-samples/
+> 8. *(Processed, planned for the Moon scenario, not in the Mars game yet)* **LRO CRaTER** dose data from the same September 2017 event, via the OSDR RadLab API.
 
 ---
 

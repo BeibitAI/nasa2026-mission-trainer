@@ -14,7 +14,7 @@
     "Welcome to Gale Crater on Mars! A 'sol' is one day on Mars: 24 hours and 40 minutes.",
     "Radiation is invisible energy from space. The dose bar shows how much the crew has absorbed. If it fills up, the crew must go home.",
     "Life support makes air and clean water. The greenhouse grows food. The shield is a storm shelter: it blocks extra radiation from solar storms.",
-    "Science means working outside. During a solar storm, working outside is risky - stay in the shelter!"
+    "The rover drives out to collect rock samples for Earth. During a solar storm, rover trips are risky - stay in the shelter!"
   ],
   "radiationFile": "radiation_mars",
   "start": {

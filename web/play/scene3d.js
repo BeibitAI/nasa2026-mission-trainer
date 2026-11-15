@@ -11,6 +11,7 @@ const FILES = {
   rock1: "SM_Decor_Rock_01", rock2: "SM_Decor_Rock_02", rock3: "SM_Decor_Rock_03", rock4: "SM_Decor_Rock_04",
 };
 
+const ROVER_PARK = -10, ROVER_RANGE = 22; // rover drives along z = 31 from x = -10 to x = 12
 const SKY = { calm: ["#2a1530", "#c46a42"], dust: ["#7a4a2a", "#d39a62"] };
 const lerpColor = (c, hex, k) => c.lerp(new THREE.Color(hex), k);
 
@@ -122,6 +123,58 @@ function makeDust(n) {
   return pts;
 }
 
+/** Simple 6-wheel rover from primitives (no rover model yet). Faces +x. */
+function makeRover() {
+  const g = new THREE.Group();
+  const white = new THREE.MeshStandardMaterial({ color: "#ece5da", roughness: 0.8, flatShading: true });
+  const grey = new THREE.MeshStandardMaterial({ color: "#8a8077", roughness: 0.9, flatShading: true });
+  const dark = new THREE.MeshStandardMaterial({ color: "#2b2b30", roughness: 1, flatShading: true });
+  const orange = new THREE.MeshStandardMaterial({ color: "#ff8a4c", roughness: 0.7, flatShading: true });
+  const blue = new THREE.MeshStandardMaterial({ color: "#4d6a96", roughness: 0.4, metalness: 0.2, flatShading: true });
+  const box = (w, h, d, m, x, y, z) => { const o = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); o.position.set(x, y, z); g.add(o); return o; };
+  box(7.4, 1.2, 4.2, white, 0, 1.9, 0);          // chassis
+  box(7.8, 0.3, 4.6, grey, 0, 2.6, 0);           // deck
+  box(1.8, 1.2, 1.8, orange, -2.6, 3.3, 0);      // sample box
+  box(2.6, 0.15, 3.4, blue, 1.6, 2.85, 0);       // solar panel
+  const mast = box(0.25, 2.6, 0.25, grey, 3.2, 4, 1.4);
+  box(0.9, 0.6, 0.9, white, 3.2, 5.4, 1.4);      // camera head
+  mast.castShadow = true;
+  const wheels = [];
+  const wheelGeo = new THREE.CylinderGeometry(0.95, 0.95, 0.7, 12).rotateX(Math.PI / 2);
+  for (const x of [-2.7, 0, 2.7]) for (const z of [-2.4, 2.4]) {
+    const w = new THREE.Mesh(wheelGeo, dark); w.position.set(x, 0.95, z); g.add(w); wheels.push(w);
+  }
+  g.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+  g.userData.wheels = wheels;
+  return g;
+}
+
+/** Sample-return rocket on its pad: carries the rock samples to Earth. */
+function makeRocket() {
+  const pad = new THREE.Group();
+  const grey = new THREE.MeshStandardMaterial({ color: "#7d746c", roughness: 1, flatShading: true });
+  const white = new THREE.MeshStandardMaterial({ color: "#f2ede6", roughness: 0.6, flatShading: true });
+  const orange = new THREE.MeshStandardMaterial({ color: "#ff8a4c", roughness: 0.6, flatShading: true });
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(3.4, 3.8, 0.5, 10), grey); base.position.y = 0.25; pad.add(base);
+  const rocket = new THREE.Group();
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 0.9, 6, 12), white); body.position.y = 3.5; rocket.add(body);
+  const nose = new THREE.Mesh(new THREE.ConeGeometry(0.9, 2.2, 12), orange); nose.position.y = 7.6; rocket.add(nose);
+  const band = new THREE.Mesh(new THREE.CylinderGeometry(0.93, 0.93, 0.5, 12), orange); band.position.y = 4.8; rocket.add(band);
+  for (let i = 0; i < 3; i++) {
+    const fin = new THREE.Mesh(new THREE.BoxGeometry(0.15, 1.6, 1.3), orange);
+    const a = (i / 3) * Math.PI * 2;
+    fin.position.set(Math.cos(a) * 1, 1.3, Math.sin(a) * 1); fin.rotation.y = -a; rocket.add(fin);
+  }
+  const flame = new THREE.Mesh(new THREE.ConeGeometry(0.75, 3.2, 10).rotateX(Math.PI),
+    new THREE.MeshBasicMaterial({ color: "#ffb347", transparent: true, opacity: 0.9 }));
+  flame.position.y = -1.1; flame.visible = false; rocket.add(flame);
+  rocket.position.y = 0.5;
+  rocket.traverse((o) => { if (o.isMesh && o !== flame) { o.castShadow = true; o.receiveShadow = true; } });
+  pad.add(rocket);
+  pad.userData = { rocket, flame };
+  return pad;
+}
+
 export async function createScene3D(wrap) {
   const canvas = document.createElement("canvas");
   canvas.className = "scene3d";
@@ -183,7 +236,13 @@ export async function createScene3D(wrap) {
   [-31, -22, -13].forEach((x, i) => place(i === 0 ? M.solar : M.solar.clone(), x, 21, 0.15));
   place(M.battery, -40, -22, 0.4);
   const station = place(M.station, 13, 17, -0.4);
-  const astro = place(M.astronaut, 14, 32, -0.6, 1.5);
+  const astro = M.astronaut;
+  astro.scale.setScalar(1.5 / 0.8); // inside the 0.8-scaled rover
+  const rover = place(makeRover(), ROVER_PARK, 31, 0, 0.8);
+  rover.add(astro);                     // the astronaut drives the rover (scale compensates the group)
+  astro.position.set(0.6, 2.75, 0); astro.rotation.y = Math.PI / 2;
+  const pad = place(makeRocket(), 12, -17, 0, 1.7);
+  const { rocket, flame } = pad.userData;
   const rocks = [M.rock1, M.rock2, M.rock3, M.rock4];
   [[38, 14, 1.6], [-42, 15, 1.4], [42, -22, 2.2], [-46, -18, 2], [-34, 34, 1.1], [-20, 40, 1.3], [30, 34, 1.2], [-6, -26, 1.8]]
     .forEach(([x, z, s], i) => place(i < 4 ? rocks[i] : rocks[i % 4].clone(), x, z, i * 1.3, s));
@@ -204,7 +263,8 @@ export async function createScene3D(wrap) {
   const look = new THREE.Vector3(-3, 6, -6);
 
   // ---- state from the game
-  const target = { solar: false, dust: false, solarFactor: 1, shield: 0, station: false, science: 0 };
+  const target = { solar: false, dust: false, solarFactor: 1, shield: 0, station: false, science: 0, launch: false };
+  let launchState = "pad", launchT = 0, roverX = ROVER_PARK, roverDist = 0;
   let skyKey = "";
   const fogCalm = new THREE.Color("#c46a42"), fogDust = new THREE.Color("#c98a55");
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -215,6 +275,10 @@ export async function createScene3D(wrap) {
     if (key !== skyKey) { sky.userData.paint(...SKY[key]); skyKey = key; }
     station.visible = !!target.station;
     astro.visible = target.science > 0;
+    if (target.launch && launchState === "pad") { launchState = reduced ? "gone" : "flying"; launchT = 0; rocket.visible = !reduced; }
+    if (target.phase === "allocate" && launchState !== "pad") { // a new sol: a fresh rocket waits on the pad
+      launchState = "pad"; rocket.position.y = 0.5; rocket.visible = true; flame.visible = false;
+    }
     dome.visible = target.shield > 0;
     domeFill.material.opacity = 0.08 + 0.035 * target.shield;
     streaks.visible = !!target.solar;
@@ -257,10 +321,25 @@ export async function createScene3D(wrap) {
     scene.fog.far = THREE.MathUtils.lerp(scene.fog.far, target.dust ? 170 : 520, 0.05);
     if (streaks.visible) streaks.userData.step(reduced ? 0 : dt);
     if (dust.visible && !reduced) dust.userData.step(dt);
-    if (astro.visible && !reduced) {
-      astro.position.x = 14 + Math.sin(t * 0.5) * 6;
-      astro.rotation.y = Math.cos(t * 0.5) > 0 ? Math.PI / 2 - 0.3 : -Math.PI / 2 + 0.3;
-      astro.position.y = Math.abs(Math.sin(t * 3)) * 0.25;
+    // rover: drives out for rock samples when it has power, otherwise parked
+    if (!reduced) {
+      const driving = target.science > 0;
+      const goal = driving ? ROVER_PARK + (1 - Math.cos(t * 0.4)) * 0.5 * ROVER_RANGE : ROVER_PARK;
+      const dx = THREE.MathUtils.clamp(goal - roverX, -12 * dt, 12 * dt);
+      roverX += dx; roverDist += dx;
+      rover.position.x = roverX;
+      const face = Math.abs(dx) > 1e-4 ? (dx > 0 ? 0 : Math.PI) : rover.rotation.y;
+      rover.rotation.y = THREE.MathUtils.lerp(rover.rotation.y, face, 0.08);
+      rover.position.y = driving ? Math.abs(Math.sin(t * 5)) * 0.08 : 0;
+      for (const w of rover.userData.wheels) w.rotation.z = -roverDist / 0.95;
+    }
+    // sample rocket: lifts off while the sol runs, comes back for the next sol
+    if (launchState === "flying") {
+      launchT += dt;
+      rocket.position.y = 0.5 + 9 * launchT * launchT;
+      flame.visible = true;
+      flame.scale.setScalar(0.85 + Math.random() * 0.3);
+      if (rocket.position.y > 220) { launchState = "gone"; rocket.visible = false; }
     }
     if (dome.visible && !reduced) domeWire.rotation.y = t * 0.05;
     renderer.render(scene, camera);
