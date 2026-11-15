@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1800 1200" fill="none">
+  <defs>
+    <linearGradient id="sky" x1="900" x2="900" y1="0" y2="1200" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#111725"/>
+      <stop offset=".42" stop-color="#3B252C"/>
+      <stop offset=".72" stop-color="#A54D3B"/>
+      <stop offset="1" stop-color="#21191D"/>
+    </linearGradient>
+    <linearGradient id="horizon" x1="900" x2="900" y1="550" y2="1020" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E58A62" stop-opacity=".55"/>
+      <stop offset=".48" stop-color="#713A35" stop-opacity=".8"/>
+      <stop offset="1" stop-color="#231B20"/>
+    </linearGradient>
+    <linearGradient id="mesa" x1="1280" x2="1280" y1="400" y2="1000" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D17C5C"/>
+      <stop offset=".42" stop-color="#773F39"/>
+      <stop offset="1" stop-color="#2B2025"/>
+    </linearGradient>
+    <linearGradient id="ground" x1="850" x2="850" y1="760" y2="1200" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#A24E3E"/>
+      <stop offset=".43" stop-color="#593038"/>
+      <stop offset="1" stop-color="#151820"/>
+    </linearGradient>
+    <radialGradient id="sun" cx="0" cy="0" r="1" gradientTransform="matrix(0 255 -255 0 1390 495)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFC18B" stop-opacity=".9"/>
+      <stop offset=".3" stop-color="#EE8B62" stop-opacity=".42"/>
+      <stop offset="1" stop-color="#E67352" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="vignette" cx="0" cy="0" r="1" gradientTransform="matrix(890 0 0 650 900 600)" gradientUnits="userSpaceOnUse">
+      <stop offset=".35" stop-color="#090D15" stop-opacity="0"/>
+      <stop offset="1" stop-color="#090D15" stop-opacity=".7"/>
+    </radialGradient>
+    <pattern id="strata" width="145" height="74" patternUnits="userSpaceOnUse">
+      <path d="M-20 20c36-14 74-15 165 0M-12 57c42-12 88-10 166 4" stroke="#F0A27A" stroke-opacity=".16" stroke-width="2"/>
+    </pattern>
+    <pattern id="grain" width="97" height="91" patternUnits="userSpaceOnUse">
+      <circle cx="7" cy="16" r="1.5" fill="#FFE0C6" fill-opacity=".26"/>
+      <circle cx="56" cy="61" r="1" fill="#FFE0C6" fill-opacity=".2"/>
+      <circle cx="82" cy="27" r="1.3" fill="#1B1820" fill-opacity=".3"/>
+      <circle cx="29" cy="82" r="1" fill="#FFE0C6" fill-opacity=".16"/>
+    </pattern>
+    <clipPath id="frame">
+      <path d="M0 0h1800v1200H0z"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#frame)">
+    <path fill="url(#sky)" d="M0 0h1800v1200H0z"/>
+    <circle cx="1390" cy="495" r="255" fill="url(#sun)"/>
+    <circle cx="1390" cy="495" r="100" fill="#F4B17D" fill-opacity=".73"/>
+    <path d="m0 637 105-23 84 9 94-77 78 7 117-104 79 11 109-61 106 18 98-43 105 13 79-46 66 8 98-61 85 5 77-37 116 25 103-45 100 19v388H0V637Z" fill="#32242B"/>
+    <path d="m0 688 114-40 95 8 87-61 77 17 95-76 98 25 110-83 111 42 98-52 101 23 98-53 93 37 108-39 97 25 89-58 128 55v377H0V688Z" fill="#4B2D31"/>
+    <path d="m708 801 82-68 29-112 52-55 21-105 70-62 55-2 22 73 79 30 55 64 68 27 52 69 84 41 96 1 124 48 32 169H593l45-111 34-48 36-79Z" fill="url(#mesa)"/>
+    <path d="m871 610 28-139 63-66 55-3 19 67 72 26 54 53 73 27 29 56-79 22-57-19-41 24-89-17-65 31-87-21Z" fill="#E09368" fill-opacity=".55"/>
+    <path d="M714 791c116-43 228-50 355-20 114 28 243 22 370-18 126-40 238-36 361 2v445H0V909c211-73 466-62 714-118Z" fill="url(#horizon)"/>
+    <path d="M0 973c178-61 324-78 481-31 152 45 259 36 391-7 116-38 254-29 369 8 157 50 352 22 559-43v300H0V973Z" fill="url(#ground)"/>
+    <path d="M0 973c178-61 324-78 481-31 152 45 259 36 391-7 116-38 254-29 369 8 157 50 352 22 559-43v300H0V973Z" fill="url(#strata)" opacity=".7"/>
+    <path d="M0 973c178-61 324-78 481-31 152 45 259 36 391-7 116-38 254-29 369 8 157 50 352 22 559-43v300H0V973Z" fill="url(#grain)" opacity=".8"/>
+    <path d="m1115 948 88-14 55 20 85-12 51 24-74 13-65-5-81 17-70-12-67 15-93-17 74-20 87-9 70 0Z" fill="#171A20" fill-opacity=".67"/>
+    <path d="m326 1046 109-27 90 9 71 28-68 14-99-9-103 18-88-9 88-24Z" fill="#241C22" fill-opacity=".62"/>
+    <path d="m806 806 34-111m104 102 23-165m98 172 49-126m91 165 27-85" stroke="#F0A27A" stroke-opacity=".19" stroke-width="3"/>
+    <path d="M0 0h1800v1200H0z" fill="url(#vignette)"/>
+  </g>
+</svg>
