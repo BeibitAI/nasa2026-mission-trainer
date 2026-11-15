@@ -13,12 +13,13 @@
       <div class="brand">
         <span class="planet" aria-hidden="true"></span>
         <div>
-          <div class="brand-title">Gale Crater Base</div>
+          <div class="brand-title" id="brandTitle">Gale Crater Base</div>
           <div class="brand-sub" id="solLabel">Loading mission data…</div>
         </div>
       </div>
       <ol class="sols" id="solDots" aria-label="Mission progress"></ol>
       <div class="top-actions">
+        <button class="ghost" id="btnLang" type="button">RU</button>
         <button class="ghost" id="btnSources" type="button">Data sources</button>
         <button class="ghost icon" id="btnFull" type="button" title="Full screen" aria-label="Full screen">⛶</button>
       </div>
@@ -33,7 +34,7 @@
         <div class="commander" id="commander" aria-live="polite">
           <div class="avatar" aria-hidden="true">N</div>
           <div class="bubble">
-            <div class="who">Commander Nova <span class="badge" id="cmdBadge"></span></div>
+            <div class="who"><span id="cmdName">Commander Nova</span> <span class="badge" id="cmdBadge"></span></div>
             <p class="say" id="cmdText">Getting ready…</p>
             <p class="tip" id="cmdTip"></p>
           </div>

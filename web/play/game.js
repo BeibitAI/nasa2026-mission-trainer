@@ -1,6 +1,8 @@
 // Mars Base Trainer: browser UI. Rules live in sim.js; data comes from data/*.json
 // (copied from unity/MissionTrainer/Assets/_Project/Resources/Data by the Pages workflow).
+// Texts: i18n.js (English + Russian).
 import { SYSTEMS, availablePower, simulate, makeRng, EventDirector, pickFact } from "./sim.js";
+import { t, tr, lang, setLang, initialLang } from "./i18n.js";
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -9,21 +11,11 @@ const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 const params = new URLSearchParams(location.search);
 const OFFLINE = params.has("offline");
 
-const SYS_UI = {
-  lifeSupport: { ico: "💨", name: "Life Support", hint: (c) => `Air & water. Needs ${c.systems.lifeSupport.upkeep} to stay steady.` },
-  greenhouse: { ico: "🌱", name: "Greenhouse", hint: (c) => `Food. Needs ${c.systems.greenhouse.upkeep} to stay steady.` },
-  shield: { ico: "🛡️", name: "Storm Shield", hint: () => "Blocks extra radiation, only in solar storms." },
-  science: { ico: "🔬", name: "Science", hint: () => "Work outside: +1 point per power." },
-};
-const FAIL_TEXT = {
-  air: "The air ran out.",
-  food: "The food ran out.",
-  dose: "Too much radiation: the crew had to go home.",
-  science: "Time is up before the science goal.",
-};
+const ICONS = { lifeSupport: "💨", greenhouse: "🌱", shield: "🛡️", science: "🔬" };
 
-let D = {};   // loaded data
-let G = null; // current game
+let D = {};             // loaded data
+let G = null;           // current game
+let overlayView = null; // re-draws the open overlay (used after a language switch)
 
 // ---------------------------------------------------------------- data
 async function loadJson(name) {
@@ -34,13 +26,13 @@ async function loadJson(name) {
 
 async function fetchWithTimeout(url, opts = {}) {
   const ctl = new AbortController();
-  const t = setTimeout(() => ctl.abort(), (D.config?.requestTimeoutSec || 6) * 1000);
+  const timer = setTimeout(() => ctl.abort(), (D.config?.requestTimeoutSec || 6) * 1000);
   try {
     const res = await fetch(url, { ...opts, signal: ctl.signal });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } finally {
-    clearTimeout(t);
+    clearTimeout(timer);
   }
 }
 
@@ -62,7 +54,7 @@ function newGame() {
     director: new EventDirector(D.scenario, D.events, D.radiation, D.sw, makeRng(seed)),
     state: { ...D.scenario.start },
     sol: 0,
-    station: false,       // powered this sol
+    station: false,        // powered this sol
     stationFrom: Infinity, // first sol the station gives warnings
     alloc: null, cond: null, result: null, history: [], phase: "allocate", reqId: 0,
   };
@@ -141,14 +133,14 @@ function changeAlloc(key, delta) {
 const surpriseIn = (r) => r?.conditions.active.some((a) => !a.known);
 
 function commanderEvents(phase) {
-  if (phase === "briefing") return G.cond.active.filter((a) => a.known).map((a) => ({ id: a.def.id, fact: a.def.fact }));
-  const ev = G.result.conditions.active.map((a) => ({ id: a.def.id, fact: a.def.fact }));
-  if (surpriseIn(G.result)) ev.push({ id: "comms_delay", fact: D.scenario.commsDelayFact });
+  if (phase === "briefing") return G.cond.active.filter((a) => a.known).map((a) => ({ id: a.def.id, fact: tr.evFact(a.def) }));
+  const ev = G.result.conditions.active.map((a) => ({ id: a.def.id, fact: tr.evFact(a.def) }));
+  if (surpriseIn(G.result)) ev.push({ id: "comms_delay", fact: tr.comms(D.scenario) });
   return ev;
 }
 
 function localReply(phase, outcome, events) {
-  const fb = D.fallback;
+  const fb = tr.fallback(D.fallback);
   let text = pick(fb[phase === "briefing" ? "briefing" : outcome] || fb.ok);
   if (phase === "debrief" && events[0]?.fact) text = `${events[0].fact} ${text}`;
   return { text, tip: pick(fb.tips), source: "local" };
@@ -159,13 +151,13 @@ async function askCommander(phase) {
   const events = commanderEvents(phase);
   const r = G.result;
   const outcome = phase === "debrief" ? r.outcome : "ok";
-  showCommander({ text: "Commander Nova is thinking…", tip: "", source: "wait" });
+  showCommander({ text: t.thinking, tip: "", source: "wait" });
   const body = {
     sessionId: G.sessionId, scenario: "mars", sol: G.sol, phase,
     allocation: phase === "debrief" ? r.allocation : G.alloc,
     before: phase === "debrief" ? r.before : G.state,
     after: phase === "debrief" ? r.after : G.state,
-    events, outcome,
+    events, outcome, lang,
   };
   let reply = null;
   if (!OFFLINE) {
@@ -173,7 +165,10 @@ async function askCommander(phase) {
       reply = await fetchWithTimeout(`${D.config.apiBaseUrl}/api/commander`, {
         method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
       });
-      if (!reply?.text) reply = null;
+      // The server's own fallback texts are English only: use the local ones for other languages.
+      if (!reply?.text || (lang !== "en" && reply.source === "fallback")) reply = null;
+      // Old server or a model slip: an English reply in the Russian game -> local Russian text.
+      else if (lang === "ru" && !/[а-яё]/i.test(reply.text)) reply = null;
     } catch { reply = null; }
   }
   if (id !== G.reqId) return; // a newer request replaced this one
@@ -181,12 +176,11 @@ async function askCommander(phase) {
 }
 
 function showCommander(rep) {
-  const box = $("commander");
-  box.classList.toggle("thinking", rep.source === "wait");
+  $("commander").classList.toggle("thinking", rep.source === "wait");
   $("cmdText").textContent = rep.text;
   $("cmdTip").textContent = rep.tip ? `💡 ${rep.tip}` : "";
   const ai = rep.source === "gemini" || rep.source === "cache";
-  $("cmdBadge").textContent = rep.source === "wait" ? "" : ai ? "written by AI (Google Gemini)" : "built-in message";
+  $("cmdBadge").textContent = rep.source === "wait" ? "" : ai ? t.badgeAi : t.badgeLocal;
   const over = $("overCmd");
   if (over && rep.source !== "wait") over.textContent = rep.text;
 }
@@ -202,30 +196,30 @@ function render() {
 
 function renderHeader() {
   const n = D.scenario.sols;
-  $("solLabel").textContent = `Sol ${G.sol} of ${n}`;
+  $("solLabel").textContent = t.solOf(G.sol, n);
   const lost = G.result?.outcome === "fail" && G.phase !== "simulate";
   $("solDots").innerHTML = Array.from({ length: n }, (_, i) => {
     const s = i + 1;
     const cls = s < G.sol ? "done" : s === G.sol ? (lost ? "lost" : "now") : "";
-    return `<li class="${cls}" title="Sol ${s}"></li>`;
+    return `<li class="${cls}" title="${t.solDot(s)}"></li>`;
   }).join("");
 }
 
 function renderBars() {
   const st = G.state, cfg = D.scenario, goal = cfg.systems.science.goal;
-  const bar = (label, value, max, color, cls, extra = "") => `
+  const bar = (label, value, max, color, cls) => `
     <div class="bar ${cls}">
       <div class="bar-head"><span>${label}</span><span class="v">${value}</span></div>
-      <div class="track"><div class="fill" style="width:${Math.min(100, (parseFloat(value) / max) * 100)}%;background:${color}"></div>${extra}</div>
+      <div class="track"><div class="fill" style="width:${Math.min(100, (parseFloat(value) / max) * 100)}%;background:${color}"></div></div>
     </div>`;
   const lvl = (v) => (v < 30 ? "danger" : v < 50 ? "low" : "");
   const dose = st.dose;
   $("bars").innerHTML =
-    bar("💨 Air & water", Math.round(st.air), 100, "var(--air)", lvl(st.air)) +
-    bar("🌱 Food", Math.round(st.food), 100, "var(--food)", lvl(st.food)) +
-    bar("☢️ Radiation", `${Math.round(dose)} / ${cfg.doseLimit}`, cfg.doseLimit, "var(--dose)",
+    bar(t.barAir, Math.round(st.air), 100, "var(--air)", lvl(st.air)) +
+    bar(t.barFood, Math.round(st.food), 100, "var(--food)", lvl(st.food)) +
+    bar(t.barDose, `${Math.round(dose)} / ${cfg.doseLimit}`, cfg.doseLimit, "var(--dose)",
       dose > cfg.doseLimit * 0.7 ? "danger" : dose > cfg.doseLimit * 0.5 ? "low" : "") +
-    bar("🔬 Science", `${st.science} / ${goal}`, goal, "var(--science)", "");
+    bar(t.barSci, `${st.science} / ${goal}`, goal, "var(--science)", "");
 }
 
 function stormState() {
@@ -314,10 +308,10 @@ function renderScene() {
     ${rays}`;
 
   const tags = [];
-  if (solar) tags.push('<span class="tag storm">☢️ Solar storm!</span>');
-  if (dust) tags.push('<span class="tag dust">🌪️ Dust storm: half power</span>');
-  if (!solar && !dust) tags.push('<span class="tag">☀️ Calm sol</span>');
-  if (station) tags.push(`<span class="tag station">📡 Weather Station${hasStation(G.sol + 1) && !hasStation(G.sol) ? " (ready next sol)" : ""}</span>`);
+  if (solar) tags.push(`<span class="tag storm">${t.tagStorm}</span>`);
+  if (dust) tags.push(`<span class="tag dust">${t.tagDust}</span>`);
+  if (!solar && !dust) tags.push(`<span class="tag">${t.tagCalm}</span>`);
+  if (station) tags.push(`<span class="tag station">${t.tagStation}${hasStation(G.sol + 1) && !hasStation(G.sol) ? t.tagStationNext : ""}</span>`);
   $("sceneTags").innerHTML = tags.join("");
 }
 
@@ -325,65 +319,81 @@ function renderPanel() {
   const p = $("panel");
   if (G.phase === "allocate") p.innerHTML = allocateHtml();
   else if (G.phase === "simulate") p.innerHTML = `
-    <div class="running"><h2>Sol ${G.sol} is running…</h2>
+    <div class="running"><h2>${t.running(G.sol)}</h2>
       <div class="progress" style="--dur:1.7s"><div></div></div>
-      <p class="muted small">The crew is following your plan.</p></div>`;
+      <p class="muted small">${t.crew}</p></div>`;
   else p.innerHTML = debriefHtml();
   bindPanel();
+}
+
+const eventDef = (id) => D.events.events.find((e) => e.id === id);
+
+/** Translated text of a director note (sim.js keeps English `text` plus structured fields). */
+function noteText(n) {
+  const def = n.id ? eventDef(n.id) : null;
+  switch (n.kind) {
+    case "sun": return t.sun(D.sw, D.sw?.riskLevel);
+    case "station": return t.noteStation(n.on);
+    case "warning": return def ? t.noteWarning(tr.evTitle(def)) : n.text;
+    case "event": return def ? t.noteEvent(tr.evTitle(def), n.day, n.of) : n.text;
+    default: return n.text;
+  }
 }
 
 function allocateHtml() {
   const cfg = D.scenario, total = totalPower(), base = availablePower(cfg, G.cond);
   const notes = G.cond.notes
     .filter((n) => n.kind !== "intro") // intro text is on the start screen
-    .map((n) => `<div class="note ${n.kind}${n.id ? ` event-${n.id}` : ""}">${esc(n.text)}</div>`).join("");
+    .map((n) => `<div class="note ${n.kind}${n.id ? ` event-${n.id}` : ""}">${esc(noteText(n))}</div>`).join("");
   const tokens = Array.from({ length: total }, (_, i) => `<span class="token${i >= free() ? " used" : ""}"></span>`).join("");
   const cards = SYSTEMS.map((k) => {
-    const ui = SYS_UI[k];
+    const ui = t.sys[k];
     return `<div class="sys ${k}">
-      <span class="ico" aria-hidden="true">${ui.ico}</span><span class="name">${ui.name}</span><span class="hint">${esc(ui.hint(cfg))}</span>
+      <span class="ico" aria-hidden="true">${ICONS[k]}</span><span class="name">${ui.name}</span><span class="hint">${esc(ui.hint(cfg.systems[k].upkeep))}</span>
       <div class="ctrl">
-        <button class="step" data-k="${k}" data-d="-1" aria-label="Less power to ${ui.name}" ${G.alloc[k] <= 0 ? "disabled" : ""}>−</button>
+        <button class="step" data-k="${k}" data-d="-1" aria-label="${esc(t.less(ui.name))}" ${G.alloc[k] <= 0 ? "disabled" : ""}>−</button>
         <span class="val" aria-live="polite">${G.alloc[k]}</span>
-        <button class="step" data-k="${k}" data-d="1" aria-label="More power to ${ui.name}" ${free() <= 0 ? "disabled" : ""}>+</button>
+        <button class="step" data-k="${k}" data-d="1" aria-label="${esc(t.more(ui.name))}" ${free() <= 0 ? "disabled" : ""}>+</button>
       </div></div>`;
   }).join("");
   const cost = cfg.weatherStationPowerCost;
   const canOn = G.station || free() >= cost;
   const s = cfg.systems;
   let hint = "";
-  if (G.alloc.lifeSupport < s.lifeSupport.upkeep) hint = "⚠️ Life Support is below 3: the air will drop.";
-  else if (G.alloc.greenhouse < s.greenhouse.upkeep) hint = "⚠️ Greenhouse is below 2: the food will drop.";
-  else if (free() > 0) hint = `You still have ${free()} power left.`;
+  if (G.alloc.lifeSupport < s.lifeSupport.upkeep) hint = t.hintLs(s.lifeSupport.upkeep);
+  else if (G.alloc.greenhouse < s.greenhouse.upkeep) hint = t.hintGh(s.greenhouse.upkeep);
+  else if (free() > 0) hint = t.hintFree(free());
 
   return `
     <div class="notes">${notes}</div>
-    <div class="power"><span class="power-label">⚡ Power: ${free()} of ${total} left</span><span class="tokens">${tokens}</span></div>
-    ${base < cfg.powerPerSol ? `<div class="muted small">The dust blocks the Sun: only ${base} power today.</div>` : ""}
+    <div class="power"><span class="power-label">${t.power(free(), total)}</span><span class="tokens">${tokens}</span></div>
+    ${base < cfg.powerPerSol ? `<div class="muted small">${t.dustPower(base)}</div>` : ""}
     <div class="systems">${cards}</div>
     <div class="station">
       <span class="ico" style="font-size:26px" aria-hidden="true">📡</span>
-      <div class="txt"><b>Weather Station</b><br>Costs ${cost} power every sol. Warns about solar storms one sol early (starts next sol).</div>
-      <button class="switch" id="swStation" role="switch" aria-checked="${G.station}" aria-label="Weather Station" ${canOn ? "" : "disabled"}></button>
+      <div class="txt"><b>${t.stationTitle}</b><br>${t.stationDesc(cost)}</div>
+      <button class="switch" id="swStation" role="switch" aria-checked="${G.station}" aria-label="${t.stationTitle}" ${canOn ? "" : "disabled"}></button>
     </div>
     ${hint ? `<div class="hint-line">${esc(hint)}</div>` : ""}
-    <button class="go" id="btnRun">▶ Run sol ${G.sol}</button>`;
+    <button class="go" id="btnRun">${t.run(G.sol)}</button>`;
 }
 
 const srcById = (id) => D.sources.sources.find((s) => s.id === id);
 const srcLink = (id) => {
-  const s = srcById(id);
-  return s ? `<a class="src" href="${esc(s.url)}" target="_blank" rel="noopener">Source: ${esc(s.provider)} — ${esc(s.title)}</a>` : "";
+  const raw = srcById(id);
+  if (!raw) return "";
+  const s = tr.source(raw);
+  return `<a class="src" href="${esc(s.url)}" target="_blank" rel="noopener">${esc(t.source(s.provider, s.title))}</a>`;
 };
 const fmtDate = (iso, plusDays) => new Date(Date.parse(iso) + plusDays * 864e5)
-  .toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
+  .toLocaleDateString(t.dateLocale, { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
 
 function debriefHtml() {
   const r = G.result, cfg = D.scenario, s = cfg.systems;
   const d = (k) => r1(r.after[k] - r.before[k]);
   const sign = (v) => (v > 0 ? `+${v}` : `${v}`);
-  const cls = (v, good = 1) => (v === 0 ? "same" : v * good > 0 ? "up" : "down");
-  const chg = (label, k, good = 1) => `<div class="chg">${label} <b class="${k === "dose" ? (d(k) > 0 ? "dose-up" : "same") : cls(d(k), good)}">${sign(d(k))}</b></div>`;
+  const cls = (v) => (v === 0 ? "same" : v > 0 ? "up" : "down");
+  const chg = (label, k) => `<div class="chg">${label} <b class="${k === "dose" ? (d(k) > 0 ? "dose-up" : "same") : cls(d(k))}">${sign(d(k))}</b></div>`;
 
   const a = r.allocation;
   const m = r.conditions.radiationMultiplier, storm = Math.max(0, m - 1);
@@ -391,35 +401,35 @@ function debriefHtml() {
   const stormExtra = cfg.baseDosePerSol * storm * (1 - r.shieldReduction);
   const outside = cfg.outsideDosePerScienceUnit * a.science * m;
   const why = [
-    `💨 Life Support got <b>${a.lifeSupport}</b> (needs ${s.lifeSupport.upkeep}) → air ${sign(d("air"))}.`,
-    `🌱 Greenhouse got <b>${a.greenhouse}</b> (needs ${s.greenhouse.upkeep}) → food ${sign(d("food"))}.`,
-    `☢️ Everyday space radiation: +${r1(everyday)}${storm > 0 ? `. Solar storm extra: +${r1(stormExtra)}${r.shieldReduction > 0 ? ` (the shield blocked ${Math.round(r.shieldReduction * 100)}%)` : " (no shield!)"}` : ""}${outside > 0 ? `. Working outside: +${r1(outside)}` : ""}.`,
+    t.whyLs(a.lifeSupport, s.lifeSupport.upkeep, sign(d("air"))),
+    t.whyGh(a.greenhouse, s.greenhouse.upkeep, sign(d("food"))),
+    `${t.whyEveryday(r1(everyday))}${storm > 0 ? `${t.whyStorm(r1(stormExtra))}${r.shieldReduction > 0 ? t.whyBlocked(Math.round(r.shieldReduction * 100)) : t.whyNoShield}` : ""}${outside > 0 ? t.whyOutside(r1(outside)) : ""}.`,
   ];
-  if (storm === 0 && a.shield > 0) why.push("🛡️ No storm today, so the shield had nothing to block.");
+  if (storm === 0 && a.shield > 0) why.push(t.whyCalmShield);
 
   const events = r.conditions.active.map((ev) => {
     const real = ev.def.useRealRadiationProfile;
     const rd = D.radiation.events?.[0];
-    const realLine = real && rd ? `<p><b>Today: ×${r1(ev.radiationMultiplier)} normal radiation</b> (${ev.known ? `Curiosity daily average, ${fmtDate(rd.realDate, ev.dayIndex)}` : `Curiosity's real peak hour, ${fmtDate(rd.realDate, 0)}`}).</p>` : "";
-    const surprise = !ev.known ? `<p class="surprise">⚡ Surprise! ${esc(cfg.commsDelayFact)}</p>${srcLink("comms_delay")}<br>` : "";
-    return `<div class="event-card ${ev.def.id}"><h3>${ev.def.id === "dust_storm" ? "🌪️" : "☢️"} ${esc(ev.def.title)} (day ${ev.dayIndex + 1} of ${ev.def.durationSols})</h3>
-      ${realLine}<p>${esc(ev.def.fact)}</p>${surprise}${srcLink(ev.def.sourceId)}</div>`;
+    const realLine = real && rd ? `<p><b>${t.realToday(r1(ev.radiationMultiplier))}</b> (${ev.known ? t.realDaily(fmtDate(rd.realDate, ev.dayIndex)) : t.realPeak(fmtDate(rd.realDate, 0))}).</p>` : "";
+    const surprise = !ev.known ? `<p class="surprise">${t.surprise} ${esc(tr.comms(cfg))}</p>${srcLink("comms_delay")}<br>` : "";
+    return `<div class="event-card ${ev.def.id}"><h3>${ev.def.id === "dust_storm" ? "🌪️" : "☢️"} ${esc(t.noteEvent(tr.evTitle(ev.def), ev.dayIndex + 1, ev.def.durationSols))}</h3>
+      ${realLine}<p>${esc(tr.evFact(ev.def))}</p>${surprise}${srcLink(ev.def.sourceId)}</div>`;
   }).join("");
 
-  const f = pickFact(D.facts.facts, r);
+  const raw = pickFact(D.facts.facts, r), f = raw && tr.fact(raw);
   const fact = f ? `<a class="science-card" href="${esc(f.url)}" target="_blank" rel="noopener">
-      <div class="k">🧪 Real science</div><h3>${esc(f.title)}</h3><p>${esc(f.text)}</p>
-      <div class="src">NASA OSDR study ${esc(f.studyId)} ↗</div></a>` : "";
+      <div class="k">${t.realScience}</div><h3>${esc(f.title)}</h3><p>${esc(f.text)}</p>
+      <div class="src">${esc(t.osdrStudy(f.studyId))}</div></a>` : "";
 
   const end = r.outcome === "fail" || r.outcome === "win";
-  const head = r.outcome === "win" ? "🏆 Mission complete!" : r.outcome === "fail" ? `🛰️ ${FAIL_TEXT[r.failReason] || "Mission over."}` : `Sol ${G.sol} report`;
+  const head = r.outcome === "win" ? t.headWin : r.outcome === "fail" ? `🛰️ ${t.fail[r.failReason] || t.headOver}` : t.headReport(G.sol);
   return `
     <h2>${head}</h2>
-    <div class="changes">${chg("💨 Air", "air")}${chg("🌱 Food", "food")}${chg("☢️ Dose", "dose")}${chg("🔬 Science", "science")}</div>
+    <div class="changes">${chg(t.chgAir, "air")}${chg(t.chgFood, "food")}${chg(t.chgDose, "dose")}${chg(t.chgSci, "science")}</div>
     <div class="why">${why.join("<br>")}</div>
     ${events}
     ${fact}
-    <button class="go" id="btnNext">${end ? "See mission result →" : `Start sol ${G.sol + 1} →`}</button>`;
+    <button class="go" id="btnNext">${end ? t.nextEnd : t.nextSol(G.sol + 1)}</button>`;
 }
 
 function bindPanel() {
@@ -430,31 +440,31 @@ function bindPanel() {
 }
 
 // ---------------------------------------------------------------- overlays
-function openOverlay(html) {
+function openOverlay(html, view = null) {
+  overlayView = view;
   const o = $("overlay");
   o.innerHTML = `<div class="card" role="dialog" aria-modal="true">${html}</div>`;
   o.hidden = false;
   o.querySelector("button")?.focus();
 }
-const closeOverlay = () => { $("overlay").hidden = true; $("overlay").innerHTML = ""; };
+const closeOverlay = () => { overlayView = null; $("overlay").hidden = true; $("overlay").innerHTML = ""; };
 
 function showIntro() {
-  const cfg = D.scenario, sw = D.sw;
-  const sun = new EventDirector(cfg, { events: [] }, D.radiation, sw, Math.random).realSunNote();
+  const cfg = D.scenario, g = cfg.systems.science.goal;
   openOverlay(`
     <div class="big">🚀</div>
-    <h1>Mars Base Trainer</h1>
-    <p>You are the commander of a small base in <b>Gale Crater on Mars</b>. Every <b>sol</b> (a Mars day) you share the solar power between four systems.</p>
+    <h1>${t.introTitle}</h1>
+    <p>${t.introP}</p>
     <ul>
-      <li>💨 <b>Life Support</b> needs ${cfg.systems.lifeSupport.upkeep} power for air and water.</li>
-      <li>🌱 <b>Greenhouse</b> needs ${cfg.systems.greenhouse.upkeep} power for food.</li>
-      <li>🛡️ <b>Storm Shield</b> blocks extra radiation, but only during solar storms.</li>
-      <li>🔬 <b>Science</b> is why we came: get ${cfg.systems.science.goal} points.</li>
+      <li>${t.introLs(cfg.systems.lifeSupport.upkeep)}</li>
+      <li>${t.introGh(cfg.systems.greenhouse.upkeep)}</li>
+      <li>${t.introShield}</li>
+      <li>${t.introSci(g)}</li>
     </ul>
-    <p><b>To win:</b> survive all ${cfg.sols} sols, keep the radiation dose under ${cfg.doseLimit} and reach ${cfg.systems.science.goal} science.</p>
-    <div class="note sun">${esc(sun)}</div>
-    <div class="row"><button class="go" id="btnStart">Start the mission</button></div>
-    <p class="fine">Storms use real radiation measured by NASA's Curiosity rover. Commander Nova's words are written by AI (Google Gemini) from the game's numbers.</p>`);
+    <p>${t.introWin(cfg.sols, cfg.doseLimit, g)}</p>
+    <div class="note sun">${esc(t.sun(D.sw, D.sw?.riskLevel))}</div>
+    <div class="row"><button class="go" id="btnStart">${t.start}</button></div>
+    <p class="fine">${t.introFine}</p>`, showIntro);
   $("btnStart").addEventListener("click", () => { closeOverlay(); newGame(); });
 }
 
@@ -465,50 +475,83 @@ function showOver() {
   const solsDone = win ? D.scenario.sols : r.sol;
   openOverlay(`
     <div class="big">${win ? "🏆" : "🛰️"}</div>
-    <h1>${win ? "Mission complete!" : "Mission over"}</h1>
-    <p>${win ? "You kept the crew safe and finished the science." : esc(FAIL_TEXT[r.failReason] || "")}</p>
+    <h1>${win ? t.overWin : t.overLost}</h1>
+    <p>${win ? t.overWinText : esc(t.fail[r.failReason] || "")}</p>
     <div class="stats">
-      <div class="stat"><b>${solsDone}/${D.scenario.sols}</b>sols</div>
-      <div class="stat"><b>${G.state.science}/${D.scenario.systems.science.goal}</b>science</div>
-      <div class="stat"><b>${Math.round(G.state.dose)}</b>dose</div>
+      <div class="stat"><b>${solsDone}/${D.scenario.sols}</b>${t.statSols}</div>
+      <div class="stat"><b>${G.state.science}/${D.scenario.systems.science.goal}</b>${t.statSci}</div>
+      <div class="stat"><b>${Math.round(G.state.dose)}</b>${t.statDose}</div>
     </div>
     <p id="overCmd" class="muted">${$("commander").classList.contains("thinking") ? "" : esc($("cmdText").textContent)}</p>
-    <div class="row"><button class="go" id="btnAgain">Play again</button><button class="go secondary" id="btnOverSrc">Data sources</button></div>`);
+    <div class="row"><button class="go" id="btnAgain">${t.again}</button><button class="go secondary" id="btnOverSrc">${t.btnSources}</button></div>`, showOver);
   $("btnAgain").addEventListener("click", () => { closeOverlay(); newGame(); });
   $("btnOverSrc").addEventListener("click", showSources);
 }
 
 function showSources() {
   const back = !G ? showIntro : G.phase === "over" ? showOver : null;
-  const sw = D.sw;
-  const items = D.sources.sources.map((s) => `
+  const items = D.sources.sources.map(tr.source).map((s) => `
     <a class="src-item" href="${esc(s.url)}" target="_blank" rel="noopener">
       <small>${esc(s.provider)}</small><br><b>${esc(s.title)}</b><p>${esc(s.usedFor)}</p></a>`).join("");
   openOverlay(`
-    <h1>Real NASA data in this game</h1>
-    <p class="muted small">Space weather right now: ${sw.live ? "live from NASA DONKI" : `saved copy from ${esc((sw.fetchedAt || "").slice(0, 10))}`} — ${sw.cmeCount} solar eruptions in ${sw.days} days, risk ${esc(sw.riskLevel)}.</p>
+    <h1>${t.srcTitle}</h1>
+    <p class="muted small">${esc(t.srcWeather(D.sw))}</p>
     <div class="src-list">${items}</div>
-    <div class="row"><button class="go secondary" id="btnClose">${back ? "Back" : "Close"}</button></div>`);
+    <div class="row"><button class="go secondary" id="btnClose">${back ? t.back : t.close}</button></div>`, showSources);
   $("btnClose").addEventListener("click", () => (back ? back() : closeOverlay()));
+}
+
+// ---------------------------------------------------------------- language
+function applyStatic() {
+  document.title = t.docTitle;
+  $("brandTitle").textContent = t.brand;
+  $("btnSources").textContent = t.btnSources;
+  $("btnFull").title = t.fullscreen;
+  $("btnFull").setAttribute("aria-label", t.fullscreen);
+  $("cmdName").textContent = t.cmdName;
+  $("btnLang").textContent = t.langBtn;
+  $("btnLang").title = t.langLabel;
+  $("btnLang").setAttribute("aria-label", t.langLabel);
+}
+
+function switchLang() {
+  setLang(lang === "en" ? "ru" : "en");
+  applyStatic();
+  if (!G) {
+    $("solLabel").textContent = t.ready;
+    $("cmdText").textContent = t.hi;
+  } else {
+    const over = G.phase === "over";
+    if (!over) render();
+    else { renderHeader(); renderBars(); renderScene(); renderPanel(); }
+    if (G.phase === "allocate") askCommander("briefing");
+    else if (G.phase === "debrief" || over) askCommander("debrief");
+  }
+  if (overlayView && !$("overlay").hidden) overlayView();
 }
 
 // ---------------------------------------------------------------- boot
 async function boot() {
+  setLang(initialLang());
+  applyStatic();
+  $("solLabel").textContent = t.loading;
+  $("cmdText").textContent = t.getting;
   try {
     const [config, scenario, events, radiation, snapshot, fallback, facts, sources] = await Promise.all(
       ["config", "scenario_mars", "events", "radiation_mars", "spaceweather_snapshot", "commander_fallback", "facts", "sources"].map(loadJson));
     D = { config, scenario, events, radiation, snapshot, fallback, facts, sources };
   } catch (e) {
-    $("solLabel").textContent = "Could not load mission data.";
-    $("cmdText").textContent = `Something went wrong: ${e.message}. Please reload the page.`;
+    $("solLabel").textContent = t.loadFail;
+    $("cmdText").textContent = t.wrong(e.message);
     return;
   }
-  $("solLabel").textContent = "Checking the real Sun…";
+  $("solLabel").textContent = t.checkingSun;
   D.sw = await loadSpaceWeather();
-  $("solLabel").textContent = "Ready";
-  $("cmdText").textContent = "Hi! I'm Commander Nova. Press Start when you're ready.";
+  $("solLabel").textContent = t.ready;
+  $("cmdText").textContent = t.hi;
 
   $("btnSources").addEventListener("click", showSources);
+  $("btnLang").addEventListener("click", switchLang);
   $("btnFull").addEventListener("click", () => {
     if (document.fullscreenElement) document.exitFullscreen();
     else if (document.fullscreenEnabled) document.documentElement.requestFullscreen().catch(() => window.open(location.href, "_blank"));

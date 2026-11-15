@@ -1,5 +1,6 @@
 // Pure game rules: resource model + event director (port of the C# ResourceModel / EventDirector).
 // No DOM here, so the same file runs in the browser and in Node (balance tests).
+// Notes keep English `text` plus structured fields; the UI builds the translated text from the fields.
 
 export const SYSTEMS = ["lifeSupport", "greenhouse", "shield", "science"];
 export const WEATHER_STATION = "WeatherStation";
@@ -104,14 +105,14 @@ export class EventDirector {
     }
     if (this.cfg.commsDelaySols > 0) {
       c.notes.push(hasStation
-        ? { kind: "station", text: "Weather Station is watching the Sun: you will get storm warnings in time." }
-        : { kind: "station", text: "No Weather Station: Earth's storm warnings may arrive too late." });
+        ? { kind: "station", on: true, text: "Weather Station is watching the Sun: you will get storm warnings in time." }
+        : { kind: "station", on: false, text: "No Weather Station: Earth's storm warnings may arrive too late." });
     }
 
     for (const e of this.scheduled) {
       const day = sol - e.startSol;
       if (e.def.needsWarning && day === -1 && earlyWarning)
-        c.notes.push({ kind: "warning", text: `Space weather warning: ${e.def.title} expected tomorrow!` });
+        c.notes.push({ kind: "warning", id: e.def.id, text: `Space weather warning: ${e.def.title} expected tomorrow!` });
       if (day < 0 || day >= e.def.durationSols) continue;
 
       const known = !e.def.needsWarning || earlyWarning || day > 0;
@@ -123,7 +124,8 @@ export class EventDirector {
       c.active.push(active);
       c.solarFactor *= active.solarFactor;
       c.radiationMultiplier *= active.radiationMultiplier;
-      if (known) c.notes.push({ kind: "event", text: `${e.def.title} (day ${day + 1} of ${e.def.durationSols})`, id: e.def.id });
+      if (known) c.notes.push({ kind: "event", id: e.def.id, day: day + 1, of: e.def.durationSols,
+        text: `${e.def.title} (day ${day + 1} of ${e.def.durationSols})` });
       // Unknown on day 1 = the comms-delay surprise; revealed in the debrief.
     }
     return c;

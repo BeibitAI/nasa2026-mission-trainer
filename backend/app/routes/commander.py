@@ -55,6 +55,7 @@ class CommanderRequest(BaseModel):
     after: Snapshot = Field(default_factory=Snapshot)
     events: list[EventInfo] = Field(default_factory=list)
     outcome: Literal["ok", "warning", "fail", "win"] = "ok"
+    lang: Literal["en", "ru"] = "en"
 
 
 class CommanderReply(BaseModel):
@@ -91,7 +92,14 @@ HOW TO ANSWER:
 - Be kind and encouraging, never scary: no words about illness, injury or death.
 - Vary your first words; do not start with "Great job" every time.
 - "text": 2-3 short sentences, at most 30 words. "tip": one concrete suggestion, at most 12 words.
-Reply as JSON: {{"text": "...", "tip": "..."}}"""
+{lang_rule}Reply as JSON: {{"text": "...", "tip": "..."}}"""
+
+LANG_RULES = {
+    "en": "",
+    "ru": ("LANGUAGE: write \"text\" and \"tip\" in simple Russian for a child, address the player as \"ты\". "
+           "Use these game words: сол, Жизнеобеспечение, Теплица, Щит от бури, Наука, Метеостанция, доза радиации. "
+           "The rules above still apply.\n"),
+}
 
 STORM_IDS = {"solar_storm"}
 DUST_IDS = {"dust_storm"}
@@ -195,7 +203,7 @@ def _bucket(v: float) -> int:
 
 def _cache_key(req: CommanderRequest) -> str:
     a = req.allocation
-    key = (req.scenario, req.phase, req.outcome, tuple(sorted(e.id for e in req.events)),
+    key = (req.lang, req.scenario, req.phase, req.outcome, tuple(sorted(e.id for e in req.events)),
            (a.lifeSupport, a.greenhouse, a.shield, a.science),
            _bucket(req.after.air), _bucket(req.after.food), _bucket(req.after.dose))
     return hashlib.sha1(repr(key).encode()).hexdigest()
@@ -252,7 +260,7 @@ async def ask_gemini(req: CommanderRequest) -> CommanderReply | None:
         model=config.GEMINI_MODEL,
         contents=build_user_prompt(req),
         config=types.GenerateContentConfig(
-            system_instruction=SYSTEM_PROMPT.format(place=place),
+            system_instruction=SYSTEM_PROMPT.format(place=place, lang_rule=LANG_RULES[req.lang]),
             response_mime_type="application/json",
             temperature=0.7,
         ),

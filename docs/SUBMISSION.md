@@ -47,7 +47,7 @@ https://beibitai.github.io/nasa2026-mission-trainer/
 
 > **What it does**
 >
-> Sol by Sol is a turn-based base-management game that runs in any modern browser, on a computer or a phone, with no download or sign-up. The player survives a 14-sol mission at Gale Crater, Mars, and must reach a science goal.
+> Sol by Sol is a turn-based base-management game that runs in any modern browser, on a computer or a phone, with no download or sign-up. It is available in English and Russian (one button switches the language, including Commander Nova's AI replies). The player survives a 14-sol mission at Gale Crater, Mars, and must reach a science goal.
 >
 > Each sol has four steps:
 > 1. **Briefing** – Commander Nova reports the base status and space weather.
@@ -78,7 +78,7 @@ https://beibitai.github.io/nasa2026-mission-trainer/
 >
 > **Benefits and goals**
 >
-> Space can feel either too abstract or too complicated for children. Sol by Sol lets them *feel* a real mission trade-off in a few minutes, and shows that the events come from real NASA measurements. We hope teachers can use it as a 15-minute classroom activity about Mars, radiation and planning. Next steps: a Moon scenario (we already process LRO CRaTER radiation data from the same 2017 storm), a classroom mode, and more languages, starting with Kazakh and Russian.
+> Space can feel either too abstract or too complicated for children. Sol by Sol lets them *feel* a real mission trade-off in a few minutes, and shows that the events come from real NASA measurements. We hope teachers can use it as a 15-minute classroom activity about Mars, radiation and planning. Next steps: a Moon scenario (we already process LRO CRaTER radiation data from the same 2017 storm), a classroom mode, and more languages (Russian is already in; Kazakh is next).
 >
 > **Tools and technologies**
 >

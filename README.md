@@ -5,7 +5,7 @@ Share power between life support, the greenhouse, a storm shield and science —
 when the storms come. Built by Team BeibitAI (Kazakhstan) for the NASA Space Apps Challenge 2026,
 challenge [Build a Junior Astronaut Mission Trainer](https://www.spaceappschallenge.org/2026/challenges/junior-astronaut-mission-trainer/).
 
-**Play:** https://beibitai.github.io/nasa2026-mission-trainer/ (works on computers and phones; the game alone: [/play/](https://beibitai.github.io/nasa2026-mission-trainer/play/))
+**Play:** https://beibitai.github.io/nasa2026-mission-trainer/ (English and Russian; works on computers and phones; the game alone: [/play/](https://beibitai.github.io/nasa2026-mission-trainer/play/))
 
 ## NASA data used
 
