@@ -16,6 +16,7 @@ const ICONS = { lifeSupport: "💨", greenhouse: "🌱", shield: "🛡️", scie
 let D = {};             // loaded data
 let G = null;           // current game
 let overlayView = null; // re-draws the open overlay (used after a language switch)
+let S3 = null;          // 3D view (scene3d.js) once its models are loaded; SVG scene until then
 
 // ---------------------------------------------------------------- data
 async function loadJson(name) {
@@ -313,6 +314,7 @@ function renderScene() {
   if (!solar && !dust) tags.push(`<span class="tag">${t.tagCalm}</span>`);
   if (station) tags.push(`<span class="tag station">${t.tagStation}${hasStation(G.sol + 1) && !hasStation(G.sol) ? t.tagStationNext : ""}</span>`);
   $("sceneTags").innerHTML = tags.join("");
+  S3?.update({ solar, dust, solarFactor: sf, shield: a.shield, station, science: a.science });
 }
 
 function renderPanel() {
@@ -530,6 +532,21 @@ function switchLang() {
   if (overlayView && !$("overlay").hidden) overlayView();
 }
 
+// ---------------------------------------------------------------- 3D view
+async function init3D() {
+  if (params.has("svg")) return; // ?svg = keep the flat scene
+  try {
+    const mod = await import("./scene3d.js");
+    S3 = await mod.createScene3D($("sceneWrap"));
+    if (!S3) return;
+    $("sceneWrap").classList.add("has3d");
+    if (G) renderScene();
+  } catch (e) {
+    S3 = null;
+    console.warn("3D view disabled, using the SVG scene:", e);
+  }
+}
+
 // ---------------------------------------------------------------- boot
 async function boot() {
   setLang(initialLang());
@@ -562,6 +579,7 @@ async function boot() {
     if (e.key === "Escape" && !$("overlay").hidden && G && G.phase !== "over") closeOverlay();
   });
   showIntro();
+  init3D();
 }
 
 boot();

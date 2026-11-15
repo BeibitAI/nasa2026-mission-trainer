@@ -9,7 +9,6 @@
 - [ ] Ссылка на видео-демо вставлена, открывается в инкогнито
 - [ ] Абзац «What you can do in the game» совпадает с тем, что реально есть в финальной сборке (вычеркнуть то, что не успели)
 - [ ] Роли команды в последнем абзаце Detailed Description проверены (после перехода на веб-версию)
-- [ ] Если модели Бексултана попали в игру — вернуть «3D models: Blender» в Tools, иначе оставить как есть
 - [ ] Если есть ИИ-картинки/видео/голос — у них есть водяной знак, и они перечислены в Use of SI
 - [ ] Нажать **Submit for Judging**, а не только Save Progress
 
@@ -82,8 +81,9 @@ https://beibitai.github.io/nasa2026-mission-trainer/
 >
 > **Tools and technologies**
 >
-> - Game: HTML, CSS and JavaScript (no engine, no download); the base scene is drawn with SVG. The rules were first prototyped in Unity 6 (C#) and in a Python balance simulation, then ported to JavaScript.
+> - Game: HTML, CSS and JavaScript (no engine, no download). The Mars base is a 3D scene in three.js built from our own Blender models; it reacts to every choice (shield dome, weather mast, astronaut outside, dust fog, storm particles). Browsers without WebGL get a flat SVG version. The rules were first prototyped in Unity 6 (C#) and in a Python balance simulation, then ported to JavaScript.
 > - Backend: Python, FastAPI, httpx, Google Gemini API (google-genai SDK), hosted on Render
+> - 3D models: Blender (habitat, greenhouse, solar panels, weather station, shelter, battery, astronaut, rocks), exported as FBX with one shared colour palette
 > - Data pipeline: Python script that downloads Curiosity RAD data from the NASA OSDR RadLab API
 > - Website and game hosting: GitHub Pages (deployed with GitHub Actions)
 > - Code: https://github.com/BeibitAI/nasa2026-mission-trainer
@@ -102,7 +102,7 @@ https://beibitai.github.io/nasa2026-mission-trainer/
 >
 > **During development:** our team chose the challenge and designed the game concept (a Mars base run sol by sol, with real NASA radiation data). We used Claude (Anthropic) as an assistant for planning tasks, writing and reviewing code (JavaScript, Python, C#, HTML/CSS), drafting documentation and text, and checking our work against the challenge requirements. Team members reviewed, tested and edited everything. AI-assisted code and text are acknowledged in the repository README.
 >
-> **Images, video, audio:** `<none / list them — every SI-generated image or video must have a visible watermark>`. The game art (the Mars base scene) is drawn in code with SVG by our team. No NASA logos or branding were generated or used.
+> **Images, video, audio:** `<none / list them — every SI-generated image or video must have a visible watermark>`. All 3D models were made by our team in Blender during the hackathon; the fallback scene is drawn in code with SVG. No NASA logos or branding were generated or used.
 
 ---
 
@@ -128,8 +128,8 @@ https://beibitai.github.io/nasa2026-mission-trainer/
 > - Lee, S.-J. et al. (2020). Targeting myostatin/activin A protects against skeletal muscle and bone loss during spaceflight. *PNAS*. doi:10.1073/pnas.2014716117 (OSD-342)
 > - OSD-210 (Approaches for surveying cosmic radiation damage in large populations of *Arabidopsis thaliana* seeds – an Antarctic example) and OSD-418 (gastrocnemius of rats under partial weight bearing mimicking Martian gravity): study pages on NASA OSDR.
 >
-> **Software and services:** HTML/CSS/JavaScript (no third-party game libraries), Unity 6 (early prototype), Blender, Python, FastAPI, Uvicorn, Pydantic, httpx, google-genai SDK, Google Gemini API, Render (hosting), GitHub Pages and GitHub Actions.
+> **Software and services:** HTML/CSS/JavaScript, three.js r160 (MIT license, 3D rendering), Unity 6 (early prototype), Blender, Python, FastAPI, Uvicorn, Pydantic, httpx, google-genai SDK, Google Gemini API, Render (hosting), GitHub Pages and GitHub Actions.
 >
-> **Assets:** all game code, graphics and the website were made by our team during the hackathon. The game uses no third-party images, fonts, sounds or music (system fonts and emoji only). `<add any assets added later, with licenses>`
+> **Assets:** all game code, 3D models, graphics and the website were made by our team during the hackathon. Third-party code: three.js (MIT license). The game uses no third-party images, fonts, sounds or music (system fonts and emoji only). `<add any assets added later, with licenses>`
 >
 > **SI tools:** Google Gemini (in-game AI Commander), Claude by Anthropic (development assistant) – see "Use of SI".

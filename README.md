@@ -22,7 +22,8 @@ What we simplified is explained on the website, section "Data & Science".
 
 | Folder | Contents |
 |---|---|
-| `web/play/` | **The game** (HTML/CSS/JS, no build step): `sim.js` rules, `game.js` UI, `style.css` |
+| `web/play/` | **The game** (HTML/CSS/JS, no build step): `sim.js` rules, `game.js` UI, `i18n.js` EN/RU texts, `scene3d.js` 3D base (three.js r160 in `vendor/`, MIT), `models/` FBX |
+| `art-source/blender/` | Blender sources of the 3D models (Bexultan) |
 | `unity/MissionTrainer/` | Early Unity 6 prototype. `Assets/_Project/Resources/Data/*.json` is the single source of game data; the Pages workflow copies it into `web/play/data/` |
 | `backend/` | FastAPI server on Render: AI Commander (Google Gemini), NASA DONKI proxy with cache |
 | `data-pipeline/` | `fetch_radlab.py`: downloads Curiosity RAD / LRO CRaTER data from the OSDR RadLab API |

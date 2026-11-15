@@ -76,3 +76,7 @@ docs/tasks/
 # ===== Copied into the site by the Pages workflow =====
 web/data/
 web/play/data/
+
+# Blender auto-backups and the raw hand-off folder
+*.blend1
+3D/

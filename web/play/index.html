@@ -6,6 +6,9 @@
   <title>Mars Base Trainer — play</title>
   <meta name="description" content="Run a base on Mars, one sol at a time. Real NASA data decides when the storms come.">
   <link rel="stylesheet" href="style.css">
+  <script type="importmap">
+  { "imports": { "three": "./vendor/three/build/three.module.min.js", "three/addons/": "./vendor/three/examples/jsm/" } }
+  </script>
 </head>
 <body>
   <div id="app" class="app" data-phase="loading">
@@ -27,7 +30,7 @@
 
     <main class="layout">
       <section class="left">
-        <div class="scene-wrap">
+        <div class="scene-wrap" id="sceneWrap">
           <svg id="scene" class="scene" viewBox="0 0 640 300" role="img" aria-label="Your Mars base"></svg>
           <div class="scene-tags" id="sceneTags"></div>
         </div>
