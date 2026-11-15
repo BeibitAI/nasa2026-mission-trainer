@@ -11,7 +11,7 @@ const FILES = {
   rock1: "SM_Decor_Rock_01", rock2: "SM_Decor_Rock_02", rock3: "SM_Decor_Rock_03", rock4: "SM_Decor_Rock_04",
 };
 
-const ROVER_PARK = -10, ROVER_RANGE = 22, ROVER_SPEED = 0.4; // path along z = 31, x = -10..12; phase rad/s
+const ROVER_PARK = -10, ROVER_RANGE = 22, ROVER_SPEED = 0.4, ROVER_LEN = 8; // path along z = 31, x = -10..12; phase rad/s
 const SKY = { calm: ["#2a1530", "#c46a42"], dust: ["#7a4a2a", "#d39a62"] };
 const lerpColor = (c, hex, k) => c.lerp(new THREE.Color(hex), k);
 
@@ -123,7 +123,55 @@ function makeDust(n) {
   return pts;
 }
 
-/** Simple 6-wheel rover from primitives (no rover model yet). Faces +x. */
+/** Merge meshes into one mesh per material (few draw calls). `pre` is applied after each mesh's world matrix. */
+function mergeByMaterial(meshes, pre) {
+  const buckets = new Map();
+  for (const m of meshes) {
+    let g = m.geometry.clone().applyMatrix4(new THREE.Matrix4().multiplyMatrices(pre, m.matrixWorld));
+    if (g.index) g = g.toNonIndexed();
+    for (const k of Object.keys(g.attributes)) if (!["position", "normal"].includes(k)) g.deleteAttribute(k);
+    g.clearGroups();
+    if (!buckets.has(m.material)) buckets.set(m.material, []);
+    buckets.get(m.material).push(g);
+  }
+  const group = new THREE.Group();
+  for (const [material, geos] of buckets) {
+    const mesh = new THREE.Mesh(mergeGeometries(geos, false), material);
+    mesh.castShadow = true; mesh.receiveShadow = true;
+    group.add(mesh);
+  }
+  return group;
+}
+
+/** Bexultan's crewed six-wheel rover: body merged by material, each wheel its own group so it can spin.
+ *  The model faces +x with wheel axles along z; it is scaled to ROVER_LEN and stands on y = 0. */
+function prepareRoverModel(root) {
+  root.updateMatrixWorld(true);
+  const pivots = [];
+  root.traverse((o) => { if (/wheel_pivot/i.test(o.name)) pivots.push(o); });
+  const inWheel = new Set();
+  pivots.forEach((p) => p.traverse((o) => inWheel.add(o)));
+  const meshesOf = (obj, keep) => { const out = []; obj.traverse((o) => { if (o.isMesh && keep(o)) out.push(o); }); return out; };
+  const box = new THREE.Box3().setFromObject(root), size = box.getSize(new THREE.Vector3());
+  const k = ROVER_LEN / size.x;
+  const cx = (box.min.x + box.max.x) / 2, cz = (box.min.z + box.max.z) / 2;
+  // model space -> rover space: centre on x/z, bottom on the ground, scaled
+  const toRover = new THREE.Matrix4().makeScale(k, k, k).multiply(new THREE.Matrix4().makeTranslation(-cx, -box.min.y, -cz));
+  const g = new THREE.Group();
+  g.add(mergeByMaterial(meshesOf(root, (o) => !inWheel.has(o)), toRover));
+  const wheels = pivots.map((p) => {
+    const c = new THREE.Box3().setFromObject(p).getCenter(new THREE.Vector3()).applyMatrix4(toRover);
+    const w = mergeByMaterial(meshesOf(p, () => true), new THREE.Matrix4().makeTranslation(-c.x, -c.y, -c.z).multiply(toRover));
+    w.position.copy(c);
+    g.add(w);
+    return w;
+  });
+  const r = wheels.length ? new THREE.Box3().setFromObject(wheels[0]).getSize(new THREE.Vector3()).y / 2 : 1;
+  g.userData = { wheels, wheelR: r };
+  return g;
+}
+
+/** Simple 6-wheel rover from primitives (used if the rover model fails to load). Faces +x. */
 function makeRover() {
   const g = new THREE.Group();
   const white = new THREE.MeshStandardMaterial({ color: "#ece5da", roughness: 0.8, flatShading: true });
@@ -145,7 +193,7 @@ function makeRover() {
     const w = new THREE.Mesh(wheelGeo, dark); w.position.set(x, 0.95, z); g.add(w); wheels.push(w);
   }
   g.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
-  g.userData.wheels = wheels;
+  g.userData = { wheels, wheelR: 0.95 * 0.8 }; // placed at scale 0.8
   return g;
 }
 
@@ -194,10 +242,13 @@ export async function createScene3D(wrap) {
   const manager = new THREE.LoadingManager();
   manager.setURLModifier((url) => (/\.(png|jpe?g|tga)$/i.test(url) ? "models/palette.png" : url));
   const loader = new FBXLoader(manager);
+  // the rover model is optional: if it fails, the simple primitive rover is used
+  const roverLoad = loader.loadAsync("models/SM_Vehicle_Rover.fbx").then(prepareRoverModel).catch(() => null);
   const entries = await Promise.all(Object.entries(FILES).map(async ([key, file]) => {
     const root = await loader.loadAsync(`models/${file}.fbx`);
     return [key, root];
   }));
+  const roverModel = await roverLoad;
   const M = {};
   for (const [key, root] of entries) {
     const obj = mergeModel(root);
@@ -237,10 +288,13 @@ export async function createScene3D(wrap) {
   place(M.battery, -40, -22, 0.4);
   const station = place(M.station, 13, 17, -0.4);
   const astro = M.astronaut;
-  astro.scale.setScalar(1.5 / 0.8); // inside the 0.8-scaled rover
-  const rover = place(makeRover(), ROVER_PARK, 31, 0, 0.8);
-  rover.add(astro);                     // the astronaut drives the rover (scale compensates the group)
-  astro.position.set(0.6, 2.75, 0); astro.rotation.y = Math.PI / 2;
+  const rover = roverModel ? place(roverModel, ROVER_PARK, 31) : place(makeRover(), ROVER_PARK, 31, 0, 0.8);
+  if (!roverModel) {
+    // simple rover: the astronaut rides on top (the real model has a cabin, so the driver sits inside)
+    astro.scale.setScalar(1.5 / 0.8); // inside the 0.8-scaled rover
+    rover.add(astro);
+    astro.position.set(0.6, 2.75, 0); astro.rotation.y = Math.PI / 2;
+  }
   const pad = place(makeRocket(), 12, -17, 0, 1.7);
   const { rocket, flame } = pad.userData;
   const rocks = [M.rock1, M.rock2, M.rock3, M.rock4];
@@ -333,13 +387,13 @@ export async function createScene3D(wrap) {
       }
       const x = ROVER_PARK + (1 - Math.cos(roverPhase)) * 0.5 * ROVER_RANGE;
       const dx = x - roverX;
-      roverX = x; roverDist += dx;
+      roverX = x; roverDist += Math.abs(dx); // wheels roll forward: the rover always faces its way
       rover.position.x = x;
       if (Math.abs(dx) > 0.002) rover.rotation.y = THREE.MathUtils.lerp(rover.rotation.y, dx > 0 ? 0 : Math.PI, 0.1);
       const away = Math.abs(x - ROVER_PARK) > 0.05;
       astro.visible = driving || away; // the driver stays on board until the rover is home
       rover.position.y = away ? Math.abs(Math.sin(t * 5)) * 0.08 : 0;
-      for (const w of rover.userData.wheels) w.rotation.z = -roverDist / 0.95;
+      for (const w of rover.userData.wheels) w.rotation.z = -roverDist / rover.userData.wheelR;
     }
     // sample rocket: lifts off while the sol runs, comes back for the next sol
     if (launchState === "flying") {

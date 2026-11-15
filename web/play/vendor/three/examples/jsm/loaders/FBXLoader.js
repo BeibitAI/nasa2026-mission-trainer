@@ -2745,7 +2745,16 @@ class AnimationParser {
 		const scope = this;
 		rawClip.layer.forEach( function ( rawTracks ) {
 
-			tracks = tracks.concat( scope.generateTracks( rawTracks ) );
+			// BeibitAI patch: skip a broken track (e.g. no keyframes) instead of failing the whole model
+			try {
+
+				tracks = tracks.concat( scope.generateTracks( rawTracks ) );
+
+			} catch ( e ) {
+
+				// skipped silently: the game does not play FBX animations
+
+			}
 
 		} );
 

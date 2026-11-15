@@ -79,7 +79,7 @@ https://beibitai.github.io/nasa2026-mission-trainer/
 >
 > - Game: HTML, CSS and JavaScript (no engine, no download). The Mars base is a 3D scene in three.js built from our own Blender models; it reacts to every choice (shield dome, weather mast, astronaut outside, dust fog, storm particles). Browsers without WebGL get a flat SVG version. The rules were first prototyped in Unity 6 (C#) and in a Python balance simulation, then ported to JavaScript.
 > - Backend: Python, FastAPI, httpx, Google Gemini API (google-genai SDK), hosted on Render
-> - 3D models: Blender (habitat, greenhouse, solar panels, weather station, shelter, battery, astronaut, rocks), exported as FBX with one shared colour palette
+> - 3D models: Blender (habitat, greenhouse, solar panels, weather station, shelter, battery, astronaut, rocks with one shared colour palette; a crewed six-wheel rover), exported as FBX
 > - Data pipeline: Python script that downloads Curiosity RAD data from the NASA OSDR RadLab API
 > - Website and game hosting: GitHub Pages (deployed with GitHub Actions)
 > - Code: https://github.com/BeibitAI/nasa2026-mission-trainer
