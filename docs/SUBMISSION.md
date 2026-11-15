@@ -5,10 +5,10 @@
 Ограничений по объёму у полей нет. Всё на странице проекта — **только на английском**.
 
 **Перед вставкой (Вс 22:30, Адлет + Дария):**
-- [ ] Финальное название выбрано (варианты ниже) и заменено везде, где стоит `Sol by Sol`
+- [x] Финальное название: **Sol by Sol: Mars Base Trainer**
 - [ ] Ссылка на видео-демо вставлена, открывается в инкогнито
 - [ ] Абзац «What you can do in the game» совпадает с тем, что реально есть в финальной сборке (вычеркнуть то, что не успели)
-- [ ] Роли команды в последнем абзаце Detailed Description проверены (после перехода на веб-версию)
+- [x] Роли команды проверены (Арыстан — lead engineer)
 - [ ] Если есть ИИ-картинки/видео/голос — у них есть водяной знак, и они перечислены в Use of SI
 - [ ] Нажать **Submit for Judging**, а не только Save Progress
 
@@ -16,11 +16,7 @@
 
 ## Project Name
 
-Варианты (выбрать на синке; Дария могла предложить свои):
-
-1. **Sol by Sol: Mars Base Trainer** ← рекомендую: игра и правда идёт «сол за солом», понятно, что это Марс и тренажёр
-2. **Mission Gale: Junior Astronaut Trainer**
-3. **Storm Shelter: A Mars Base Game**
+> Sol by Sol: Mars Base Trainer
 
 ---
 
@@ -88,7 +84,7 @@ https://beibitai.github.io/nasa2026-mission-trainer/
 > - Website and game hosting: GitHub Pages (deployed with GitHub Actions)
 > - Code: https://github.com/BeibitAI/nasa2026-mission-trainer
 >
-> **Team BeibitAI (Kazakhstan):** Adlet (captain, game logic, backend, AI and data), Arystan (Unity prototype), Omar (testing and gameplay recording), Bexultan (3D artist), Muhammad (website), Dariya (demo, presentation and texts).
+> **Team BeibitAI (Kazakhstan):** Adlet (captain, game logic, backend, AI and data), Arystan (lead engineer), Omar (testing and gameplay recording), Bexultan (3D artist), Muhammad (website), Dariya (demo, presentation and texts).
 
 ---
 

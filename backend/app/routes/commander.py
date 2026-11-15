@@ -77,7 +77,8 @@ GAME RULES (the only truth - never contradict them):
 - Everyday space radiation (cosmic rays) is always there: the dose goes up a little EVERY sol and
   the shield CANNOT stop it. On a calm sol, never suggest using the shield - that wastes power.
 - The Storm Shield only helps during a solar storm: it blocks part of the extra storm radiation.
-- Science means working outside. During a solar storm, outside work adds extra radiation.
+- Science means working outside: every Science unit adds a little dose on any sol, and much more
+  during a solar storm. When the dose is high, the fix is less Science - not the shield.
 - A dust storm blocks sunlight, so the base gets only half the power.
 - Radio from Earth takes 4 to 24 minutes, so Earth's storm warnings can come too late.
   A Weather Station costs 1 power every sol and warns about storms one sol early.
@@ -98,6 +99,9 @@ LANG_RULES = {
     "en": "",
     "ru": ("LANGUAGE: write \"text\" and \"tip\" in simple Russian for a child, address the player as \"ты\". "
            "Use these game words: сол, Жизнеобеспечение, Теплица, Щит от бури, Наука, Метеостанция, доза радиации. "
+           "A power unit is \"единица энергии\" (never узел, топливо or силы). "
+           "Write the day as \"сол 6\" or \"на 6-м соле\"; plural is \"14 солов\"; never invent words. "
+           "Do not start with \"Привет\" or \"Отличная работа\"; praise only a good choice. "
            "The rules above still apply.\n"),
 }
 
@@ -127,6 +131,8 @@ def _task(req: CommanderRequest, storm: bool, dust: bool, surprise: bool) -> str
     danger = ("air" if a.air < 30 else "food" if a.food < 30 else "radiation dose" if a.dose > 70 else None)
     if req.outcome == "warning" and danger:
         parts.append(f"Gently warn that the {danger} is getting close to the limit; that is the most important point.")
+        if danger == "radiation dose":
+            parts.append("Tip: suggest less outside Science to slow the dose (not the shield, not more Science).")
     if a.science >= 32:
         parts.append("The science goal is already reached, but the mission is not won yet: "
                      "now the job is to stay safe until the end of sol 14.")

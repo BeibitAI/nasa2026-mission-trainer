@@ -49,7 +49,7 @@ Open http://localhost:8000/play/ (on Windows, if it stays on "Loading", use `npx
 
 ## Team BeibitAI
 
-Adlet (captain, game logic, backend, AI and data) · Arystan (Unity prototype) · Omar (testing, gameplay recording) ·
+Adlet (captain, game logic, backend, AI and data) · Arystan (lead engineer) · Omar (testing, gameplay recording) ·
 Bexultan (3D artist) · Muhammad (website) · Dariya (demo, presentation, texts)
 
 This is a student hackathon project and is not endorsed by NASA.

@@ -2,7 +2,7 @@
 // English data stays in Resources/Data/*.json (single source); Russian overrides live here, keyed by id.
 
 const EN = {
-  docTitle: "Mars Base Trainer — play",
+  docTitle: "Sol by Sol: Mars Base Trainer",
   brand: "Gale Crater Base",
   loading: "Loading mission data…",
   btnSources: "Data sources",
@@ -85,7 +85,7 @@ const EN = {
   nextEnd: "See mission result →",
   nextSol: (s) => `Start sol ${s} →`,
 
-  introTitle: "Mars Base Trainer",
+  introTitle: "Sol by Sol: Mars Base Trainer",
   introP: "You are the commander of a small base in <b>Gale Crater on Mars</b>. Every <b>sol</b> (a Mars day) you share the solar power between four systems.",
   introLs: (n) => `💨 <b>Life Support</b> needs ${n} power for air and water.`,
   introGh: (n) => `🌱 <b>Greenhouse</b> needs ${n} power for food.`,
@@ -112,7 +112,7 @@ const EN = {
 };
 
 const RU = {
-  docTitle: "Тренажёр марсианской базы — игра",
+  docTitle: "Sol by Sol: тренажёр марсианской базы",
   brand: "База в кратере Гейл",
   loading: "Загружаем данные миссии…",
   btnSources: "Источники",
@@ -195,7 +195,7 @@ const RU = {
   nextEnd: "Итоги миссии →",
   nextSol: (s) => `Начать сол ${s} →`,
 
-  introTitle: "Тренажёр марсианской базы",
+  introTitle: "Sol by Sol: тренажёр марсианской базы",
   introP: "Ты — командир маленькой базы в <b>кратере Гейл на Марсе</b>. Каждый <b>сол</b> (марсианский день) ты делишь солнечную энергию между четырьмя системами.",
   introLs: (n) => `💨 <b>Жизнеобеспечению</b> нужно ${n} энергии для воздуха и воды.`,
   introGh: (n) => `🌱 <b>Теплице</b> нужно ${n} энергии для еды.`,
