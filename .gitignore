@@ -72,3 +72,7 @@ desktop.ini
 
 # Per-member Word task files: shared in the team chat, not in git
 docs/tasks/
+
+# ===== Copied into the site by the Pages workflow =====
+web/data/
+web/play/data/

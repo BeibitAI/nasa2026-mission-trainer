@@ -1,11 +1,12 @@
-# Deploys web/ (landing + Unity WebGL build in web/play/) to GitHub Pages on every push to main.
+# Deploys web/ (landing + the HTML/JS game in web/play/) to GitHub Pages on every push to main.
+# Game data is copied from the Unity Resources/Data folder, which stays the single source of truth.
 # OWNER: Muhammad
 name: Deploy web to GitHub Pages
 
 on:
   push:
     branches: [main]
-    paths: ["web/**", "unity/MissionTrainer/Assets/_Project/Resources/Data/sources.json", ".github/workflows/pages.yml"]
+    paths: ["web/**", "unity/MissionTrainer/Assets/_Project/Resources/Data/**", ".github/workflows/pages.yml"]
   workflow_dispatch:
 
 permissions:
@@ -27,8 +28,10 @@ jobs:
       - uses: actions/checkout@v4
       - name: Copy shared data into the site
         run: |
-          mkdir -p web/data
-          cp unity/MissionTrainer/Assets/_Project/Resources/Data/sources.json web/data/sources.json
+          DATA=unity/MissionTrainer/Assets/_Project/Resources/Data
+          mkdir -p web/data web/play/data
+          cp "$DATA/sources.json" web/data/sources.json
+          cp "$DATA"/*.json web/play/data/
           touch web/.nojekyll
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
