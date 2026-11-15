@@ -4,13 +4,16 @@
 Поля и правила взяты из [Project Submission Guide](https://www.spaceappschallenge.org/resources/project-submission-guide/) (проверено Сб 14.11).
 Ограничений по объёму у полей нет. Всё на странице проекта — **только на английском**.
 
-**Перед вставкой (Вс 22:30, Адлет + Дария):**
+**ПОДАНО: Вс 15.11.2026 23:29 (Алматы), статус «Project Submitted for Judging».**
+Публичная страница: https://www.spaceappschallenge.org/2026/find-a-team/beibitai/?tab=project
+Ниже — тексты ровно в том виде, в каком они отправлены.
+
 - [x] Финальное название: **Sol by Sol: Mars Base Trainer**
-- [ ] Ссылка на видео-демо вставлена, открывается в инкогнито
-- [ ] Абзац «What you can do in the game» совпадает с тем, что реально есть в финальной сборке (вычеркнуть то, что не успели)
+- [x] Ссылка на видео-демо вставлена, открывается без входа (https://youtu.be/Gwsnrwm37Ds, 29,8 с)
+- [x] Описание совпадает с финальной сборкой
 - [x] Роли команды проверены (Арыстан — lead engineer)
-- [ ] Если есть ИИ-картинки/видео/голос — у них есть водяной знак, и они перечислены в Use of SI
-- [ ] Нажать **Submit for Judging**, а не только Save Progress
+- [x] ИИ-голос в видео подписан на экране («AI-generated voice») и указан в Use of SI и в описании YouTube
+- [x] Нажато **Submit for Judging**
 
 ---
 
@@ -22,13 +25,15 @@
 
 ## High-Level Project Summary
 
-> Sol by Sol is a free browser game for kids aged 7–12 that turns them into the commander of a small base in Gale Crater on Mars. Every sol (a Mars day), the player splits 10 power units between life support, the greenhouse, a storm shield and rover trips that collect rock samples to send to Earth. Dust storms cut solar power, and solar storms raise radiation — and the storm in the game is real: it uses the radiation that NASA's Curiosity rover measured at Gale Crater on 11–12 September 2017. Because radio messages take 4–24 minutes to cross from Earth, players must decide whether to pay power for a local Weather Station that warns them in time. Live NASA DONKI space-weather data changes how likely storms are, and a friendly AI Commander explains in simple words why each choice led to what happened. There is no free safe choice: kids learn the real trade-offs mission planners face, and see the NASA data behind every event.
+> Sol by Sol is a free browser game for kids aged 7–12 that turns them into the commander of a small base in Gale Crater on Mars. Every sol (a Mars day), the player splits 10 power units between life support, the greenhouse, a storm shield and rover trips that collect rock samples to send to Earth. Dust storms cut solar power, and solar storms raise radiation. The storm in the game is real: it uses the radiation that NASA's Curiosity rover measured at Gale Crater on 11–12 September 2017. Because radio messages take 4–24 minutes to cross from Earth, players must decide whether to pay power for a local Weather Station that warns them in time. Live NASA DONKI space-weather data changes how likely storms are, and a friendly AI Commander explains in simple words why each choice led to what happened. There is no free safe choice: kids learn the real trade-offs mission planners face, and see the NASA data behind every event.
 
 ---
 
 ## Link to Project Demo
 
-`<YouTube link — Дария, Вс 21:30>` (видео ≤ 30 с, английские субтитры, Public/Unlisted)
+https://youtu.be/Gwsnrwm37Ds
+
+(29,8 с, запись настоящей игры, английские субтитры, ИИ-голос с пометкой на экране. Файл и сценарий сборки: [presentation/](presentation/README.md).)
 
 ## Link to Final Project
 
@@ -46,13 +51,13 @@ https://beibitai.github.io/nasa2026-mission-trainer/
 >
 > Each sol has four steps:
 > 1. **Briefing** – Commander Nova reports the base status and space weather.
-> 2. **Share the power** – 10 power units go to Life Support (air and water), Greenhouse (food), Storm Shield and the Rover (an astronaut drives out for rock samples; a rocket sends them to Earth). A dust storm halves the power.
+> 2. **Share the power** – 10 power units go to Life Support (air and water), Greenhouse (food), Storm Shield and the Rover (an astronaut drives out for rock samples; a rocket sends them to Earth). A Weather Station can also be switched on for 1 power per sol. A dust storm halves the power.
 > 3. **The sol happens** – the base reacts to events: dust storms, and a solar particle storm based on real Curiosity measurements.
 > 4. **Debrief** – the Commander explains *why* the bars changed, and a "Real science" card shares a real NASA space-biology study.
 >
 > **Real trade-offs, no free safe choice**
 >
-> Every unit of power has a cost. Shielding every sol wastes power and the sample goal is missed. Never shielding lets a storm push the radiation dose over the limit. Rover trips count as work outside, so they become risky during storms. We tested the rules with a simulation of 3,000 random missions: putting the same split every sol wins only 47% of the time, while reacting to storm warnings (shield up, stay inside) with the Weather Station on wins 92%. Without the station, the first storm day is a surprise and the win rate drops to 27% — the game's way of teaching the communication delay between Earth and Mars.
+> Every unit of power has a cost. Shielding every sol wastes power and the sample goal is missed. Never shielding lets a storm push the radiation dose over the limit. Every rover trip is work outside and adds radiation dose, so sending too many trips, especially during a storm, is risky. Without the Weather Station, the first storm day can be a surprise – the game's way of teaching the communication delay between Earth and Mars. We balanced the rules with a Python simulation of thousands of random missions, so that planning ahead and reacting to storm warnings is what wins.
 >
 > **How NASA data drives the game**
 >
@@ -61,11 +66,11 @@ https://beibitai.github.io/nasa2026-mission-trainer/
 > - **NASA OSDR:** five "Real science" cards from studies OSD-476 (plants grown in Apollo lunar soil), OSD-268 (lettuce grown on the ISS), OSD-210 (seeds exposed to cosmic radiation), OSD-342 (mice on the ISS losing muscle and bone) and OSD-418 (Mars-gravity muscle study).
 > - **NASA sources** for rock sample return (Perseverance seals rock cores in tubes for return to Earth), the communication delay (4–24 minutes), the 2018 dust storm that silenced the Opportunity rover, and the astronaut radiation limit (NASA-STD-3001).
 >
-> Every source is listed inside the game (the "Data sources" button) and on our website, with links. Each storm card in the game shows the real number for that day (for example, "×2.3 normal radiation, Curiosity daily average, 11 Sep 2017") with a link to its source. The website also explains, in a "Data & Science" section, exactly what we simplified (for example: dose is shown in game points, not sieverts; storm strength is real).
+> Every source is listed inside the game (the "Data sources" button) and on our website, with links. Each storm card in the game shows the real number for that day (for example, "×2.3 normal radiation, Curiosity daily average, 11 Sep 2017") with a link to its source. The website also explains exactly what we simplified (for example: dose is shown in game points, not sieverts; storm strength is real).
 >
 > **AI Commander**
 >
-> Commander Nova's short briefing before each sol and explanation after it are generated by Google Gemini from the game's own numbers only, and the game labels them "written by AI (Google Gemini)". The model is instructed to use simple English for a 7-year-old, to be encouraging, and never to invent data. Requests go through our server (the API key is never in the browser), with rate limiting and caching. If the AI is unavailable, the game uses pre-written texts, so it always works — even fully offline.
+> Commander Nova's short briefing before each sol and explanation after it are generated by Google Gemini from the game's own numbers only, and the game labels them "written by AI (Google Gemini)". The model is instructed to use simple words for a 7-year-old, to be encouraging, and never to invent data. Requests go through our server (the API key is never in the browser), with rate limiting and caching. If the AI is unavailable, the game uses pre-written texts, so it always works.
 >
 > **Safe for children**
 >
@@ -77,11 +82,12 @@ https://beibitai.github.io/nasa2026-mission-trainer/
 >
 > **Tools and technologies**
 >
-> - Game: HTML, CSS and JavaScript (no engine, no download). The Mars base is a 3D scene in three.js built from our own Blender models; it reacts to every choice (shield dome, weather mast, astronaut outside, dust fog, storm particles). Browsers without WebGL get a flat SVG version. The rules were first prototyped in Unity 6 (C#) and in a Python balance simulation, then ported to JavaScript.
-> - Backend: Python, FastAPI, httpx, Google Gemini API (google-genai SDK), hosted on Render
-> - 3D models: Blender (habitat, greenhouse, solar panels, weather station, shelter, battery, astronaut, rocks with one shared colour palette; a crewed six-wheel rover), exported as FBX
-> - Data pipeline: Python script that downloads Curiosity RAD data from the NASA OSDR RadLab API
-> - Website and game hosting: GitHub Pages (deployed with GitHub Actions)
+> - Game: HTML, CSS and JavaScript (no engine, no download). The Mars base is a 3D scene in three.js built from our own Blender models; it reacts to every choice (shield dome, weather mast, rover driving out, rocket launch, dust fog, storm particles). Browsers without WebGL get a flat SVG version. The rules were first prototyped in Unity 6 (C#) and in a Python balance simulation, then ported to JavaScript.
+> - Backend: Python, FastAPI, httpx, Google Gemini API (google-genai SDK), hosted on Render.
+> - 3D models: Blender (habitat, greenhouse, solar panels, weather station, shelter, battery, astronaut, rocks, and a crewed six-wheel rover), exported as FBX.
+> - Data pipeline: Python script that downloads Curiosity RAD data from the NASA OSDR RadLab API.
+> - Website and game hosting: GitHub Pages (deployed with GitHub Actions).
+> - Demo video: screen recording of the real game; the voice-over is AI-generated (Microsoft neural text-to-speech) and labelled on screen.
 > - Code: https://github.com/BeibitAI/nasa2026-mission-trainer
 >
 > **Team BeibitAI (Kazakhstan):** Adlet (captain, game logic, backend, AI and data), Arystan (lead engineer), Omar (testing and gameplay recording), Bexultan (3D artist), Muhammad (website), Dariya (demo, presentation and texts).
@@ -92,13 +98,15 @@ https://beibitai.github.io/nasa2026-mission-trainer/
 
 (Это поле судьи не видят, оно для статистики. Но судьи видят пометки в самом проекте — README и раздел на сайте уже есть.)
 
-> Yes.
+Отмеченные варианты (8 из 10): генерация идей; исследование и сбор информации; анализ и интерпретация данных; внедрение SI/ML в проект; программирование и отладка; написание, редактирование и перевод текстов; визуальный дизайн; презентация, видео или аудио. Не отмечены: «другие виды» и «не использовали SI».
+
+> **Inside the game:** Google Gemini (model "gemini-flash-lite-latest", via our FastAPI server) writes Commander Nova's short briefings and explanations from the game's own numbers only. Every AI text is labelled in the game as "written by AI (Google Gemini)". Pre-written texts are used if the AI fails.
 >
-> **Inside the game:** Google Gemini (model "gemini-flash-lite-latest", via our FastAPI server) writes the AI Commander's short explanations from the game's own numbers. It is instructed to use only those numbers and facts; pre-written texts are used if it fails. This is disclosed on our website ("How we used AI").
+> **During development:** our team chose the challenge and designed the game concept (a Mars base run sol by sol, with real NASA radiation data). We used Claude (Anthropic) as an assistant for planning tasks, researching and checking NASA sources, processing data, writing and reviewing code (JavaScript, Python, C#, HTML/CSS), translating texts into Russian, drafting documentation, and laying out the presentation slides. Team members reviewed, tested and edited everything. AI assistance is acknowledged in the repository README and on our website ("How we used AI").
 >
-> **During development:** our team chose the challenge and designed the game concept (a Mars base run sol by sol, with real NASA radiation data). We used Claude (Anthropic) as an assistant for planning tasks, writing and reviewing code (JavaScript, Python, C#, HTML/CSS), drafting documentation and text, and checking our work against the challenge requirements. Team members reviewed, tested and edited everything. AI-assisted code and text are acknowledged in the repository README.
+> **Video and audio:** the demo video is a screen recording of the real game. Its voice-over is AI-generated (Microsoft neural text-to-speech) and is labelled on screen ("AI-generated voice") and in the video description.
 >
-> **Images, video, audio:** `<none / list them — every SI-generated image or video must have a visible watermark>`. All 3D models were made by our team in Blender during the hackathon; the fallback scene is drawn in code with SVG. No NASA logos or branding were generated or used.
+> **Images:** no AI-generated images. All 3D models were made by our team in Blender; the fallback scene is drawn in code with SVG. No NASA logos, flags or mission identifiers were generated or used.
 
 ---
 
@@ -111,7 +119,9 @@ https://beibitai.github.io/nasa2026-mission-trainer/
 > 5. **NASA – Opportunity rover mission comes to end** (2018 planet-wide dust storm). https://www.nasa.gov/news-release/nasas-record-setting-opportunity-rover-mission-on-mars-comes-to-end/
 > 6. **NASA-STD-3001 radiation protection technical brief** (astronaut radiation limit). https://www.nasa.gov/wp-content/uploads/2023/03/radiation-protection-technical-brief-ochmo.pdf
 > 7. **NASA – Mars Rock Samples** (Perseverance sample tubes, planned return to Earth). https://science.nasa.gov/mission/mars-2020-perseverance/mars-rock-samples/
-> 8. *(Processed, planned for the Moon scenario, not in the Mars game yet)* **LRO CRaTER** dose data from the same September 2017 event, via the OSDR RadLab API.
+> 8. *(Processed, planned for the Moon scenario, not in the Mars game yet; not listed on the submission page)* **LRO CRaTER** dose data from the same September 2017 event, via the OSDR RadLab API.
+
+На странице подачи пункты 1–7 добавлены ссылками (поле «Текст ссылки» + URL).
 
 ---
 
@@ -127,6 +137,24 @@ https://beibitai.github.io/nasa2026-mission-trainer/
 >
 > **Software and services:** HTML/CSS/JavaScript, three.js r160 (MIT license, 3D rendering), Unity 6 (early prototype), Blender, Python, FastAPI, Uvicorn, Pydantic, httpx, google-genai SDK, Google Gemini API, Render (hosting), GitHub Pages and GitHub Actions.
 >
-> **Assets:** all game code, 3D models, graphics and the website were made by our team during the hackathon. Third-party code: three.js (MIT license). The game uses no third-party images, fonts, sounds or music (system fonts and emoji only). `<add any assets added later, with licenses>`
+> **Assets:** all game code, 3D models, graphics and the website were made by our team during the hackathon. Third-party code: three.js (MIT license). The game uses no third-party images, fonts, sounds or music (system fonts and emoji only). The presentation slides use the Montserrat font (SIL Open Font License) and qrcode-generator (MIT license); the demo video voice was made with edge-tts (Microsoft neural TTS).
 >
-> **SI tools:** Google Gemini (in-game AI Commander), Claude by Anthropic (development assistant) – see "Use of SI".
+> **SI tools:** Google Gemini (in-game AI Commander), Claude by Anthropic (development assistant), Microsoft neural TTS (demo video voice) – see "Use of SI".
+
+Ссылки, добавленные на странице подачи (13):
+
+| Текст ссылки | URL |
+|---|---|
+| Paul et al. 2022 – Plants grown in Apollo lunar regolith (Communications Biology, OSD-476) | https://doi.org/10.1038/s42003-022-03334-8 |
+| Khodadad et al. 2020 – Lettuce grown on the ISS (Frontiers in Plant Science, OSD-268) | https://doi.org/10.3389/fpls.2020.00199 |
+| Lee et al. 2020 – Muscle and bone loss in spaceflight (PNAS, OSD-342) | https://doi.org/10.1073/pnas.2014716117 |
+| Our source code (GitHub) | https://github.com/BeibitAI/nasa2026-mission-trainer |
+| three.js r160 – 3D rendering (MIT license) | https://github.com/mrdoob/three.js |
+| Google Gemini API – AI Commander texts | https://ai.google.dev/ |
+| FastAPI – backend framework (MIT license) | https://fastapi.tiangolo.com/ |
+| Render – backend hosting | https://render.com/ |
+| GitHub Pages – website and game hosting | https://pages.github.com/ |
+| Blender – 3D models made by our team | https://www.blender.org/ |
+| edge-tts – AI voice-over for the demo video (Microsoft neural TTS) | https://github.com/rany2/edge-tts |
+| Montserrat font – presentation slides (SIL Open Font License) | https://fonts.google.com/specimen/Montserrat |
+| qrcode-generator – QR code on the slides (MIT license) | https://github.com/kazuhikoarase/qrcode-generator |

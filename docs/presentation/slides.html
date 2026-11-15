@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sol by Sol — presentation</title>
+<!-- Rebuilt from Dariya's deck (same layout and texts, with fact fixes). Print to PDF: see README.md here. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<style>
+  @page { size: 1600px 900px; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #070b22; }
+  body { font-family: "Montserrat", system-ui, sans-serif; color: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .slide {
+    position: relative; width: 1600px; height: 900px; overflow: hidden; page-break-after: always; break-after: page;
+    background: radial-gradient(ellipse 900px 520px at 42% 22%, #1f2a66 0%, #121a48 38%, #0a1030 72%, #070b22 100%);
+  }
+  .slide:last-child { page-break-after: auto; break-after: auto; }
+  .stars { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .content { position: absolute; inset: 0; padding: 70px 72px 0; }
+
+  .kicker { font-size: 16px; font-weight: 700; letter-spacing: .32em; color: #8fd8f8; }
+  .kicker .dot { color: #8fd8f8; margin: 0 .5em; }
+  h1.title { margin-top: 14px; font-size: 48px; font-weight: 800; letter-spacing: .045em; text-transform: uppercase; }
+
+  .cards { position: absolute; left: 66px; right: 66px; top: 300px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .card {
+    height: 430px; border-radius: 20px; padding: 66px 48px 40px;
+    background: linear-gradient(180deg, rgba(14,20,52,.78), rgba(8,12,34,.78));
+    border: 1.5px solid rgba(190,205,255,.22);
+  }
+  .card h3 { font-size: 23px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; line-height: 1.55; min-height: 72px; }
+  .card p { margin-top: 34px; font-size: 24px; font-weight: 300; line-height: 1.95; color: #cfd5e6; }
+  .card .big { font-size: 70px; font-weight: 800; color: #9fe3ff; letter-spacing: .01em; line-height: 1; min-height: 72px; }
+  .card .big small { font-size: 40px; font-weight: 700; }
+  .card .big + p { margin-top: 70px; }
+
+  .foot { position: absolute; left: 68px; right: 72px; bottom: 30px; display: flex; justify-content: space-between; font-size: 16px; letter-spacing: .08em; color: #aeb5cc; }
+
+  /* slide 1 */
+  .planet { position: absolute; left: 50%; top: 600px; width: 1500px; height: 1500px; margin-left: -750px; border-radius: 50%; }
+  .planet-glow { position: absolute; left: 50%; top: 560px; width: 1640px; height: 1640px; margin-left: -820px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,120,60,.0) 44%, rgba(255,110,60,.28) 46.5%, rgba(120,60,90,.18) 48.5%, rgba(0,0,0,0) 52%); }
+  .corner { position: absolute; top: 46px; font-size: 18px; font-weight: 500; letter-spacing: .3em; color: #dfe4f2; }
+  .corner.l { left: 52px; } .corner.r { right: 52px; }
+  .hero { position: absolute; left: 0; right: 0; top: 150px; text-align: center; }
+  .hero .name { font-size: 172px; font-weight: 800; letter-spacing: .06em; line-height: 1; text-shadow: 0 6px 30px rgba(0,0,0,.35); }
+  .hero .sub { margin-top: 42px; font-size: 40px; font-weight: 400; letter-spacing: .32em; color: #93d8f6; }
+  .hero .tag { margin-top: 36px; font-size: 26px; font-weight: 400; color: #eef1f8; }
+  .team { position: relative; z-index: 2; width: 940px; margin: 26px auto 0; padding: 22px 30px 26px; border-radius: 12px;
+    background: rgba(12,18,48,.72); border: 1.5px solid rgba(190,205,255,.22); }
+  .team .k { font-size: 16px; font-weight: 700; letter-spacing: .3em; color: #8fd8f8; }
+  .team .names { margin-top: 20px; display: grid; grid-template-columns: repeat(3, 1fr); row-gap: 20px; font-size: 19px; color: #e6e9f2; }
+  .playnow { position: absolute; left: 0; right: 0; bottom: 116px; text-align: center; font-size: 19px; letter-spacing: .2em; color: #f4e6dc; }
+  .playnow .sep { margin: 0 .9em; opacity: .8; }
+
+  /* slide 7 */
+  .qrbox { position: absolute; left: 74px; top: 304px; width: 476px; height: 488px; border-radius: 20px;
+    background: rgba(12,18,48,.78); border: 1.5px solid rgba(190,205,255,.22); display: flex; align-items: center; justify-content: center; }
+  .qr { width: 392px; height: 392px; background: #fff; padding: 22px; }
+  .qr svg { width: 100%; height: 100%; display: block; }
+  .scan { position: absolute; left: 74px; width: 476px; top: 808px; text-align: center; font-size: 18px; font-weight: 700; letter-spacing: .3em; color: #8fd8f8; }
+  .rows { position: absolute; left: 598px; right: 72px; top: 304px; display: grid; gap: 20px; }
+  .row { height: 150px; border-radius: 12px; padding: 34px 40px; display: grid; grid-template-columns: 110px 1fr; align-items: start;
+    background: rgba(12,18,48,.72); border: 1.5px solid rgba(190,205,255,.22); }
+  .row .n { font-size: 38px; font-weight: 800; color: #9fe3ff; line-height: 1.3; }
+  .row h4 { font-size: 22px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+  .row p { margin-top: 18px; font-size: 19px; font-weight: 300; color: #cfd5e6; }
+  .note { position: absolute; left: 598px; bottom: 50px; font-size: 15px; letter-spacing: .06em; color: #aeb5cc; }
+</style>
+</head>
+<body>
+
+<!-- 1 -->
+<section class="slide" data-stars="260">
+  <div class="planet-glow"></div>
+  <svg class="planet" viewBox="0 0 100 100" aria-hidden="true">
+    <defs>
+      <radialGradient id="mars" cx="45%" cy="30%" r="70%">
+        <stop offset="0" stop-color="#e8804a"/><stop offset=".55" stop-color="#d4632f"/><stop offset="1" stop-color="#8a3a22"/>
+      </radialGradient>
+      <filter id="grain" x="0" y="0" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency="1.6" numOctaves="3" seed="7" result="n"/>
+        <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .55 0" result="a"/>
+        <feComposite in="a" in2="SourceGraphic" operator="in"/>
+      </filter>
+      <clipPath id="disc"><circle cx="50" cy="50" r="50"/></clipPath>
+    </defs>
+    <circle cx="50" cy="50" r="50" fill="url(#mars)"/>
+    <g clip-path="url(#disc)"><rect width="100" height="100" fill="#5a2210" filter="url(#grain)" opacity=".55"/></g>
+  </svg>
+  <div class="corner l">NASA SPACE APPS 2026</div>
+  <div class="corner r">TEAM BEIBITAI · KAZAKHSTAN</div>
+  <div class="hero">
+    <div class="name">SOL BY SOL</div>
+    <div class="sub">MARS BASE TRAINER</div>
+    <div class="tag">A Mars base game built on real NASA data, for kids aged 7–12</div>
+    <div class="team">
+      <div class="k">TEAM</div>
+      <div class="names">
+        <span>Bekbolatkyzy Dariya</span><span>Akhmechanov Muhammad</span><span>Magzumbekov Arystan</span>
+        <span>Sanakov Omar Mirasuly</span><span>Zhenbayev Bexultan</span><span>Kozhakhmet Adilet</span>
+      </div>
+    </div>
+  </div>
+  <div class="playnow">PLAY IT NOW<span class="sep">·</span>beibitai.github.io/nasa2026-mission-trainer/#play</div>
+</section>
+
+<!-- 2 -->
+<section class="slide" data-stars="320">
+  <div class="content">
+    <div class="kicker">01<span class="dot">·</span>THE PROBLEM</div>
+    <h1 class="title">Space missions run on trade-offs</h1>
+  </div>
+  <div class="cards">
+    <div class="card"><h3>Everything competes</h3><p>Oxygen, food, power, radiation and science all draw on the same limited resources.</p></div>
+    <div class="card"><h3>Kids learn by doing</h3><p>Trade-offs stick when a child feels their consequences, not when they memorise facts.</p></div>
+    <div class="card"><h3>Most games oversimplify</h3><p>Many learning games either ignore real constraints or leave out the science.</p></div>
+  </div>
+  <div class="foot"><span>beibitai.github.io/nasa2026-mission-trainer</span><span>02 / 07</span></div>
+</section>
+
+<!-- 3 -->
+<section class="slide" data-stars="320">
+  <div class="content">
+    <div class="kicker">02<span class="dot">·</span>THE GAME</div>
+    <h1 class="title">A Mars base, run by a kid</h1>
+  </div>
+  <div class="cards">
+    <div class="card"><h3>Free, in the browser</h3><p>No download or install needed. Built for players aged 7 to 12.</p></div>
+    <div class="card"><h3>Gale Crater base</h3><p>The player runs a small research base in Gale Crater on Mars.</p></div>
+    <div class="card"><h3>14 sols to succeed</h3><p>Survive 14 sols, the Martian days, and send 32 rock samples back to Earth.</p></div>
+  </div>
+  <div class="foot"><span>beibitai.github.io/nasa2026-mission-trainer</span><span>03 / 07</span></div>
+</section>
+
+<!-- 4 -->
+<section class="slide" data-stars="320">
+  <div class="content">
+    <div class="kicker">03<span class="dot">·</span>THE CHOICE</div>
+    <h1 class="title">Ten energy blocks. Five systems.</h1>
+  </div>
+  <div class="cards">
+    <div class="card"><h3>Keep the crew alive</h3><p>Life Support supplies air, and the Greenhouse grows the food the crew needs.</p></div>
+    <div class="card"><h3>Protect or explore</h3><p>The Storm Shield blocks solar-storm radiation, while the Rover collects rock samples.</p></div>
+    <div class="card"><h3>Know what's coming</h3><p>The Weather Station warns about solar storms one sol early, before Earth's warning arrives.</p></div>
+  </div>
+  <div class="foot"><span>beibitai.github.io/nasa2026-mission-trainer</span><span>04 / 07</span></div>
+</section>
+
+<!-- 5 -->
+<section class="slide" data-stars="320">
+  <div class="content">
+    <div class="kicker">04<span class="dot">·</span>REAL NASA DATA</div>
+    <h1 class="title">The rules come from real missions</h1>
+  </div>
+  <div class="cards">
+    <div class="card"><div class="big"><small>up to</small> 2.8×</div><p>Radiation peak during the 2017 solar storm (2.3× daily average), measured by Curiosity's RAD instrument.</p></div>
+    <div class="card"><div class="big">½</div><p>A dust storm like Opportunity's 2018 storm halves solar power for that sol in the game.</p></div>
+    <div class="card"><div class="big">+1</div><p>Each unit of rover power brings back one rock sample, inspired by Perseverance's 43 sample tubes.</p></div>
+  </div>
+  <div class="foot"><span>beibitai.github.io/nasa2026-mission-trainer</span><span>05 / 07</span></div>
+</section>
+
+<!-- 6 -->
+<section class="slide" data-stars="320">
+  <div class="content">
+    <div class="kicker">05<span class="dot">·</span>LEARNING</div>
+    <h1 class="title">Commander Nova explains. Kids decide.</h1>
+  </div>
+  <div class="cards">
+    <div class="card"><h3>Plain-language briefings</h3><p>Commander Nova, powered by Google Gemini, turns game data into simple morning briefings.</p></div>
+    <div class="card"><h3>Choices with consequences</h3><p>Trade shield power for rover time, then see exactly what happens next.</p></div>
+    <div class="card"><h3>Real science cards</h3><p>After each sol, a short NASA fact about Mars or the biology of living in space.</p></div>
+  </div>
+  <div class="foot"><span>beibitai.github.io/nasa2026-mission-trainer</span><span>06 / 07</span></div>
+</section>
+
+<!-- 7 -->
+<section class="slide" data-stars="320">
+  <div class="content">
+    <div class="kicker">06<span class="dot">·</span>WHAT HAPPENS NEXT</div>
+    <h1 class="title">Play it now. Then what's next?</h1>
+  </div>
+  <div class="qrbox"><div class="qr" id="qr"></div></div>
+  <div class="scan">SCAN TO PLAY</div>
+  <div class="rows">
+    <div class="row"><div class="n">01</div><div><h4>Play the mission</h4><p>Scan the QR code or open the link to run your first sol.</p></div></div>
+    <div class="row"><div class="n">02</div><div><h4>Use it in class</h4><p>Free to play, code on GitHub. Teachers can adapt it for their own students.</p></div></div>
+    <div class="row"><div class="n">03</div><div><h4>Next: the Moon</h4><p>Lunar missions, bigger bases and classroom integration.</p></div></div>
+  </div>
+  <div class="note">NASA logos not used · No AI-generated images</div>
+  <div class="foot"><span>beibitai.github.io/nasa2026-mission-trainer</span><span>07 / 07</span></div>
+</section>
+
+<script>
+  // stars: seeded, so every render looks the same
+  let seed = 20261115;
+  const rnd = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+  document.querySelectorAll(".slide").forEach((s) => {
+    const n = Number(s.dataset.stars || 300);
+    let dots = "";
+    for (let i = 0; i < n; i++) {
+      const x = (rnd() * 1600).toFixed(1), y = (rnd() * 900).toFixed(1);
+      const r = (rnd() < 0.08 ? 1.6 + rnd() : 0.5 + rnd() * 0.9).toFixed(2), o = (0.35 + rnd() * 0.6).toFixed(2);
+      dots += `<circle cx="${x}" cy="${y}" r="${r}" fill="#fff" opacity="${o}"/>`;
+    }
+    s.insertAdjacentHTML("afterbegin", `<svg class="stars" viewBox="0 0 1600 900" aria-hidden="true">${dots}</svg>`);
+  });
+  // QR code to the game (error correction M)
+  const URL_PLAY = "https://beibitai.github.io/nasa2026-mission-trainer/";
+  const qr = qrcode(0, "M"); qr.addData(URL_PLAY); qr.make();
+  document.getElementById("qr").innerHTML = qr.createSvgTag({ cellSize: 8, margin: 0, scalable: true });
+  window.__qrText = URL_PLAY;
+</script>
+</body>
+</html>
