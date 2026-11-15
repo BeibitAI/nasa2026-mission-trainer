@@ -16,20 +16,20 @@ One turn = one Martian day (sol). A mission = **14 sols** (~6–8 min). Base sit
 **Communication delay:** on Mars, the storm warning from Earth arrives a sol late; building a local Weather Station buys the warning time back.
 
 ## MVP (must work at demo)
-- Public WebGL link, no login, Chrome/Edge desktop
+- Public browser link (HTML/JS, no engine), no login, works on computers and phones
 - Mars scenario, full 14-sol loop, 3 bars + science, win/lose, restart
 - 3 real-data events: **solar particle storm** (Curiosity RAD profile, 11–12 Sep 2017), **dust storm** (solar output drops), **Real Sun** (NASA DONKI, with data date shown)
 - Communication-delay mechanic (simple)
 - AI Commander via backend **with offline fallback texts**
 - In-game **Data Sources** screen
-- 3D base (cubes OK until models arrive)
+- Base scene (SVG drawn in code; a 3D view is optional)
 - Landing page with embedded game, data sources, SI disclosure
 
 ## Nice to have (in order)
 1. Moon (south pole) scenario — same code, different config
 2. Final models + module upgrades
 3. Leaderboard (generated nicknames only, no free text)
-4. OSDR "Real science" cards
+4. ✅ OSDR "Real science" cards (done)
 5. End-of-mission recap + mini quiz
 6. AI-generated crises
 
@@ -53,7 +53,7 @@ One turn = one Martian day (sol). A mission = **14 sols** (~6–8 min). Base sit
 | Astronaut health fact cards | [OSDR](https://osdr.nasa.gov/bio/repo/) | 🔶 curate 5–8 studies |
 | Greenhouse / food | CSA — [Food production on the Moon](https://www.asc-csa.gc.ca/eng/youth-educators/toolkits/food-production/) | ✅ |
 | Reactor module (40 kWe) | NASA Fission Surface Power — [NTRS](https://ntrs.nasa.gov/api/citations/20220004670/downloads/40%20kW%20Deployable%20FSP%20Paper_FINAL.pdf) | ✅ |
-| Dust storms kill solar power | Opportunity lost in the 2018 global dust storm | 🔶 link TBD |
+| Dust storms kill solar power | Opportunity lost in the 2018 global dust storm | ✅ nasa.gov news release (in `sources.json`) |
 | Comms delay Mars (minutes) / Moon (~1.3 s) | physics + NASA page | 🔶 link TBD |
 
 In-game the dose bar is scaled to 0–100 for playability; event cards always show the **real measured value**.

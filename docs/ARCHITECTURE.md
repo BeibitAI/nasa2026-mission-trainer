@@ -1,28 +1,28 @@
 # Architecture
 
+> **Update, Sun 15.11:** the game shipped as a plain **HTML/CSS/JS** page in `web/play/` (`sim.js` = rules ported from the C# `ResourceModel`/`EventDirector`, `game.js` = UI, SVG scene). Unity was not built (hardware loss), so the Unity sections below describe the prototype only. Game data still lives in `unity/MissionTrainer/Assets/_Project/Resources/Data/*.json`; the Pages workflow copies it to `web/play/data/`. No itch.io mirror, no leaderboard in the web game.
+
 ## 1. Overview
 
 ```
  Browser
- ├─ Landing (GitHub Pages, web/)  ──iframe──►  Unity WebGL (web/play/)
+ ├─ Landing (GitHub Pages, web/)  ──iframe──►  HTML/JS game (web/play/)
  │                                             bundled: RAD data, configs,
- │                                             fallback texts, DONKI snapshot
+ │                                             fallback texts, DONKI snapshot (web/play/data/)
  └──────────────────────────────────────────────┬─────────────
                                                 │ HTTPS JSON, 6 s timeout
                                    ┌────────────▼────────────┐
                                    │ FastAPI backend (Render) │
                                    │ /api/commander           │──► Gemini API (key in env)
                                    │ /api/spaceweather        │──► NASA DONKI (6 h cache)
-                                   │ /api/scores              │──► Supabase Postgres
+                                   │ /api/scores (not used)   │
                                    └──────────────────────────┘
 ```
 
 **Rule #1: the game is fully playable without the backend.** Render asleep, Gemini quota gone, network blocked → bundled data + fallback texts. Judges may open the link weeks later.
 
 - Game + landing: **GitHub Pages** (`https://beibitai.github.io/nasa2026-mission-trainer/`), deployed by GitHub Actions from `web/`.
-- Mirror: **itch.io** (Arystan, `butler`).
-- Backend: **Render** free web service (sleeps after ~15 min idle → UptimeRobot pings `/health` every 5 min).
-- Leaderboard DB: **Supabase** free Postgres (Render free disk is wiped on deploy).
+- Backend: **Render** free web service (sleeps after ~15 min idle → a GitHub Actions cron pings `/health` every 10 min; backend changes redeploy through a Render Deploy Hook).
 
 ## 2. Repository
 
@@ -146,13 +146,13 @@ Nicknames are **generated** (Adjective + Animal + number), no free text → no m
 ## 4. AI Commander
 
 ```
-Unity (UnityWebRequest, 6 s timeout)
+Game (fetch + AbortController, 6 s timeout)
   └─► POST /api/commander
         ├─ rate limit: per IP + 1 call per sol per session
         ├─ cache key = (phase, event ids, outcome, value buckets) → reuse
         ├─ Gemini (GEMINI_API_KEY, GEMINI_MODEL=gemini-flash-lite-latest)
         └─ error/timeout → template from commander_fallback → 200 OK
-Unity: no answer in 6 s → local template. Same UI either way.
+Game: no answer in 6 s → local template. Same UI either way.
 ```
 
 - No key in the client or the repo; only `backend/.env` (gitignored) and Render env vars.

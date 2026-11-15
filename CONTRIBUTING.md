@@ -24,7 +24,7 @@ git clone https://github.com/BeibitAI/nasa2026-mission-trainer.git
 | `Resources/Data/*.json` | структура — Омар; данные — Адлет; тексты — Дария | — |
 | `backend/`, `data-pipeline/` | **Адлет** | — |
 | `web/` (кроме `web/play/`) | **Мухаммад** | — |
-| `web/play/` (WebGL-сборка) | **Арыстан** | — |
+| `web/play/` (игра на HTML/JS) | **Адлет** | баги — в чат Адлету |
 | `docs/texts/` | **Дария** | — |
 
 Если случайно изменил чужую сцену/префаб — **не коммить**: `git checkout -- <файл>`.
@@ -42,7 +42,14 @@ git clone https://github.com/BeibitAI/nasa2026-mission-trainer.git
 
 ## 3. Запуск
 
-### Unity
+### Игра (веб-версия — то, что подаём)
+```bash
+mkdir -p web/play/data && cp unity/MissionTrainer/Assets/_Project/Resources/Data/*.json web/play/data/
+python -m http.server 8000 -d web
+```
+Открыть `http://localhost:8000/play/` (`?seed=7` — повторяемая партия, `?offline` — без сервера). Если игра висит на «Loading» — на Windows Python может отдавать `.js` с неправильным типом: используй `npx serve web`. Выкатка: push в `main` → GitHub Actions сам копирует данные и деплоит на Pages за ~1 минуту.
+
+### Unity (прототип, не деплоится)
 Unity Hub → Add → `unity/MissionTrainer` → открыть сцену `Assets/_Project/Scenes/Boot.unity` → Play.
 
 ### Бэкенд (Адлет; локально — кому нужно)
@@ -60,9 +67,9 @@ uvicorn app.main:app --reload --port 8080
 ```bash
 python -m http.server 8000 -d web
 ```
-Открыть `http://localhost:8000`. **Не открывать через `file://`** — WebGL так не работает.
+Открыть `http://localhost:8000`. **Не открывать через `file://`** — модули JS так не работают.
 
-## 4. WebGL-сборка (Арыстан)
+## 4. WebGL-сборка (Арыстан) — не используется, игра теперь веб
 
 1. Player Settings → Publishing Settings: **Compression Format = Gzip**, **Decompression Fallback = ON** (без этого не запустится на GitHub Pages).
 2. File → Build Profiles → **Web** → Build → папка **`web/play/`** (заменить содержимое).
