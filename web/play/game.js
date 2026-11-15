@@ -582,6 +582,8 @@ async function boot() {
 
   $("btnSources").addEventListener("click", showSources);
   $("btnLang").addEventListener("click", switchLang);
+  // iPhone Safari has no page fullscreen: hide the button there (inside the landing iframe it opens a new tab)
+  if (!document.fullscreenEnabled && window.self === window.top) $("btnFull").style.display = "none";
   $("btnFull").addEventListener("click", () => {
     if (document.fullscreenElement) document.exitFullscreen();
     else if (document.fullscreenEnabled) document.documentElement.requestFullscreen().catch(() => window.open(location.href, "_blank"));

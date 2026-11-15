@@ -11,7 +11,7 @@ const FILES = {
   rock1: "SM_Decor_Rock_01", rock2: "SM_Decor_Rock_02", rock3: "SM_Decor_Rock_03", rock4: "SM_Decor_Rock_04",
 };
 
-const ROVER_PARK = -10, ROVER_RANGE = 22; // rover drives along z = 31 from x = -10 to x = 12
+const ROVER_PARK = -10, ROVER_RANGE = 22, ROVER_SPEED = 0.4; // path along z = 31, x = -10..12; phase rad/s
 const SKY = { calm: ["#2a1530", "#c46a42"], dust: ["#7a4a2a", "#d39a62"] };
 const lerpColor = (c, hex, k) => c.lerp(new THREE.Color(hex), k);
 
@@ -265,6 +265,7 @@ export async function createScene3D(wrap) {
   // ---- state from the game
   const target = { solar: false, dust: false, solarFactor: 1, shield: 0, station: false, science: 0, launch: false };
   let launchState = "pad", launchT = 0, roverX = ROVER_PARK, roverDist = 0;
+  let roverPhase = 0; // position on the rover path: x = PARK + (1 - cos(phase)) / 2 * RANGE, home at 2πk
   let skyKey = "";
   const fogCalm = new THREE.Color("#c46a42"), fogDust = new THREE.Color("#c98a55");
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -274,7 +275,7 @@ export async function createScene3D(wrap) {
     const key = target.dust ? "dust" : "calm";
     if (key !== skyKey) { sky.userData.paint(...SKY[key]); skyKey = key; }
     station.visible = !!target.station;
-    astro.visible = target.science > 0;
+    if (reduced) astro.visible = target.science > 0; // otherwise the loop decides (driver stays until home)
     if (target.launch && launchState === "pad") { launchState = reduced ? "gone" : "flying"; launchT = 0; rocket.visible = !reduced; }
     if (target.phase === "allocate" && launchState !== "pad") { // a new sol: a fresh rocket waits on the pad
       launchState = "pad"; rocket.position.y = 0.5; rocket.visible = true; flame.visible = false;
@@ -321,16 +322,23 @@ export async function createScene3D(wrap) {
     scene.fog.far = THREE.MathUtils.lerp(scene.fog.far, target.dust ? 170 : 520, 0.05);
     if (streaks.visible) streaks.userData.step(reduced ? 0 : dt);
     if (dust.visible && !reduced) dust.userData.step(dt);
-    // rover: drives out for rock samples when it has power, otherwise parked
+    // rover: smooth out-and-back trips along one path while it has power; without power it finishes
+    // the way home at the same gentle speed (no dashes or sudden turns when the power changes)
     if (!reduced) {
       const driving = target.science > 0;
-      const goal = driving ? ROVER_PARK + (1 - Math.cos(t * 0.4)) * 0.5 * ROVER_RANGE : ROVER_PARK;
-      const dx = THREE.MathUtils.clamp(goal - roverX, -12 * dt, 12 * dt);
-      roverX += dx; roverDist += dx;
-      rover.position.x = roverX;
-      const face = Math.abs(dx) > 1e-4 ? (dx > 0 ? 0 : Math.PI) : rover.rotation.y;
-      rover.rotation.y = THREE.MathUtils.lerp(rover.rotation.y, face, 0.08);
-      rover.position.y = driving ? Math.abs(Math.sin(t * 5)) * 0.08 : 0;
+      if (driving) roverPhase += dt * ROVER_SPEED;
+      else {
+        const home = Math.round(roverPhase / (Math.PI * 2)) * Math.PI * 2;
+        roverPhase += THREE.MathUtils.clamp(home - roverPhase, -dt * ROVER_SPEED, dt * ROVER_SPEED);
+      }
+      const x = ROVER_PARK + (1 - Math.cos(roverPhase)) * 0.5 * ROVER_RANGE;
+      const dx = x - roverX;
+      roverX = x; roverDist += dx;
+      rover.position.x = x;
+      if (Math.abs(dx) > 0.002) rover.rotation.y = THREE.MathUtils.lerp(rover.rotation.y, dx > 0 ? 0 : Math.PI, 0.1);
+      const away = Math.abs(x - ROVER_PARK) > 0.05;
+      astro.visible = driving || away; // the driver stays on board until the rover is home
+      rover.position.y = away ? Math.abs(Math.sin(t * 5)) * 0.08 : 0;
       for (const w of rover.userData.wheels) w.rotation.z = -roverDist / 0.95;
     }
     // sample rocket: lifts off while the sol runs, comes back for the next sol
