@@ -4,17 +4,17 @@ Final materials submitted to NASA Space Apps 2026 (15 Nov 2026).
 
 | File | What it is |
 |---|---|
-| `Sol_by_Sol_presentation.pdf` | 7-slide deck (1600×900), rebuilt from Dariya's design with fact fixes |
-| `slides.html` | Source of the deck (Montserrat from Google Fonts, QR via qrcode-generator from cdnjs) |
+| `Sol_by_Sol_presentation.pdf` | Final 7-slide deck by Dariya (made in LibreOffice Impress); the QR code opens the game |
+| `slides.html` | HTML version of the same deck with the same texts (Montserrat from Google Fonts, QR via qrcode-generator from cdnjs) |
 | `Sol_by_Sol_demo.mp4` | 29.8 s demo video, also on YouTube: https://youtu.be/Gwsnrwm37Ds |
 | `video/` | Scripts that made the video |
 
-## Rebuild the PDF
+## PDF from the HTML version
 
 Open `slides.html` in Chrome or Edge and print to PDF (margins: none, background graphics: on), or headless:
 
 ```bash
-msedge --headless=new --no-pdf-header-footer --virtual-time-budget=10000 --print-to-pdf=Sol_by_Sol_presentation.pdf slides.html
+msedge --headless=new --no-pdf-header-footer --virtual-time-budget=10000 --print-to-pdf=slides.pdf slides.html
 ```
 
 ## Rebuild the video
